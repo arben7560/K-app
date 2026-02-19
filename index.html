@@ -674,9 +674,10 @@
             touch-action: pan-y;
             /* swipe horizontal géré en JS */
             user-select: none;
-         
+
             /* ou var(--panel) si tu veux */
-            background: color-mix(in oklab, var(--panel) 92%, transparent) !important;
+            background: #ffffff !important;
+            /* ✅ évite flash noir/gris */
         }
 
         /* Désactivé: plus de background global (chaque slide a son image) */
@@ -726,7 +727,8 @@
 
             /* ✅ chaque slide est hors écran par défaut */
             transform: translateX(110%);
-            transition: transform .22s ease;
+            transition: none;
+            /* ✅ stop les conflits */
             pointer-events: none;
             visibility: hidden;
         }
@@ -1144,26 +1146,6 @@
             opacity: .22;
         }
 
-        /* ===== FIX: pas de fade fantôme pendant le drag ===== */
-        .slidesTrack {
-            will-change: transform;
-        }
-
-        .slidesTrack .slide {
-            opacity: 1 !important;
-            transform: none !important;
-            transition: none !important;
-            /* ✅ évite les fades hérités */
-        }
-
-        /* le track seul anime quand on snap (pas pendant drag) */
-        .slidesTrack {
-            transition: transform .28s cubic-bezier(.2, .8, .2, 1);
-        }
-
-        .slidesTrack.is-dragging {
-            transition: none !important;
-        }
 
         /* Empêche tout overlay fixe derrière le track */
         .slides::before,
@@ -1905,17 +1887,34 @@
 
                 const i = getIndex();
                 const threshold = Math.min(120, slidesBox.clientWidth * 0.22);
+                const w = slidesBox.clientWidth;
 
+                let next = i;
                 if (Math.abs(dx) > threshold) {
                     const dir = dx < 0 ? 1 : -1;
-                    const next = Math.max(0, Math.min(slideEls.length - 1, i + dir));
-                    setIndex(next);
-                } else {
-                    setIndex(i);
+                    next = Math.max(0, Math.min(slideEls.length - 1, i + dir));
                 }
 
-                resetDrag();
+                // On anime le snap en "forçant" le translate jusqu'à la position finale
+                const from = dx;
+                const to = (next === i) ? 0 : (dx < 0 ? -w : w);
+
+                // prépare les 2 slides visibles
+                renderDrag(from);
+
+                // anime vers la fin
+                slideEls.forEach(s => s.style.transition = "transform .22s ease");
+                requestAnimationFrame(() => {
+                    renderDrag(to);
+                });
+
+                // une fois fini, on fixe l'index et on nettoie
+                setTimeout(() => {
+                    setIndex(next);
+                    resetDrag();
+                }, 230);
             }
+
 
             slidesBox.addEventListener("pointerdown", (e) => {
                 if (e.pointerType === "mouse" && e.button !== 0) return;
