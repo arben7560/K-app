@@ -175,6 +175,60 @@
                     rgba(15, 21, 37, .95) 100%);
         }
 
+        .mark {
+            position: relative;
+            z-index: 1;
+            width: 108px;
+            height: 108px;
+            border-radius: 28px;
+            display: grid;
+            place-items: center;
+            margin-bottom: 6px;
+        }
+
+        .markGlow {
+            position: absolute;
+            inset: -22px;
+            border-radius: 34px;
+            background:
+                radial-gradient(circle at 30% 25%, rgba(79, 109, 245, .55), transparent 55%),
+                radial-gradient(circle at 75% 30%, rgba(200, 182, 255, .45), transparent 60%),
+                radial-gradient(circle at 50% 85%, rgba(79, 109, 245, .22), transparent 65%);
+            filter: blur(16px);
+            opacity: .9;
+        }
+
+        .markInner {
+            width: 108px;
+            height: 108px;
+            border-radius: 28px;
+            background: color-mix(in oklab, var(--panel) 70%, transparent);
+            border: 1px solid color-mix(in oklab, var(--muted) 62%, transparent);
+            box-shadow: 0 18px 36px rgba(0, 0, 0, .18);
+            backdrop-filter: blur(10px);
+            display: grid;
+            place-items: center;
+            text-align: center;
+        }
+
+        .markKr {
+            font-family: var(--kfont);
+            font-weight: 900;
+            letter-spacing: -.6px;
+            font-size: 24px;
+            color: var(--text);
+            text-shadow: 0 0 10px rgba(79, 109, 245, .25);
+        }
+
+        .markSub {
+            margin-top: 4px;
+            font-size: 11px;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: color-mix(in oklab, var(--subtext) 86%, transparent);
+        }
+
+
         .heroContent {
             position: relative;
             z-index: 1;
@@ -1171,10 +1225,13 @@
                 <!-- SPLASH -->
                 <section class="view active" id="view-splash" aria-label="Splash">
                     <div class="splash">
-                        <div class="logo" aria-hidden="true">Se<small>KR</small></div>
-                        <h1>Study Korean in Seoul</h1>
-                        <p>Apprends le coréen réel, dans une ambiance café à Séoul.</p>
-                        <div class="pulse" aria-hidden="true"></div>
+                        <div class="mark" aria-hidden="true">
+                            <div class="markGlow"></div>
+                            <div class="markInner">
+                                <div class="markKr">서울</div>
+                                <div class="markSub">study café</div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
