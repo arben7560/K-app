@@ -1,1589 +1,1227 @@
 <!doctype html>
 <html lang="fr">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Study Korean in Seoul — Prototype</title>
-    <style>
-        :root {
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Study Korean in Seoul — Prototype</title>
 
-            --px: 0px;
-            /* parallax x */
-            --py: 0px;
-            /* parallax y */
+  <style>
+    :root{
+      --px: 0px; /* parallax x */
+      --py: 0px; /* parallax y */
 
+      --bg:#FAFAFA;
+      --panel:#FFFFFF;
+      --muted:#F2F3F5;
+      --text:#121417;
+      --subtext:#5B616B;
+      --primary:#4F6DF5;
+      --secondary:#C8B6FF;
+      --navy:#1F2A44;
 
-            --bg: #FAFAFA;
-            --panel: #FFFFFF;
-            --muted: #F2F3F5;
-            --text: #121417;
-            --subtext: #5B616B;
-            --primary: #4F6DF5;
-            --secondary: #C8B6FF;
-            --navy: #1F2A44;
+      /* CDN direct Unsplash */
+      --img-skyline: url("https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1600&q=80");
+      --img-cafe:    url("https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1600&q=80");
 
-            /* ✅ VRAIES IMAGES (Unsplash source endpoint) */
-            --img-skyline: url("https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1600&q=80");
-            --img-cafe: url("https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1600&q=80");
+      --shadow: 0 12px 28px rgba(18,20,23,.08);
+      --shadow2: 0 8px 18px rgba(18,20,23,.06);
+      --radius-xl: 22px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 12px;
+      --ring: 0 0 0 3px rgba(79,109,245,.16);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --kfont: ui-sans-serif, system-ui, -apple-system, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", Segoe UI, Roboto, Helvetica, Arial;
+    }
 
+    [data-theme="night"]{
+      --bg:#0F1525;
+      --panel: rgba(255,255,255,.06);
+      --muted: rgba(255,255,255,.08);
+      --text:#E9ECF4;
+      --subtext: rgba(233,236,244,.72);
+      --shadow: 0 18px 40px rgba(0,0,0,.38);
+      --shadow2: 0 10px 22px rgba(0,0,0,.28);
+      --ring: 0 0 0 3px rgba(200,182,255,.22);
+    }
 
-            --shadow: 0 12px 28px rgba(18, 20, 23, .08);
-            --shadow2: 0 8px 18px rgba(18, 20, 23, .06);
-            --radius-xl: 22px;
-            --radius-lg: 18px;
-            --radius-md: 14px;
-            --radius-sm: 12px;
-            --ring: 0 0 0 3px rgba(79, 109, 245, .16);
-            --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-            --kfont: ui-sans-serif, system-ui, -apple-system, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", Segoe UI, Roboto, Helvetica, Arial;
-        }
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family:var(--font);
+      background:
+        radial-gradient(1200px 900px at 12% 12%, rgba(200,182,255,.22), transparent 55%),
+        radial-gradient(1200px 900px at 88% 18%, rgba(79,109,245,.18), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x:hidden;
+    }
 
-        [data-theme="night"] {
-            --bg: #0F1525;
-            --panel: rgba(255, 255, 255, .06);
-            --muted: rgba(255, 255, 255, .08);
-            --text: #E9ECF4;
-            --subtext: rgba(233, 236, 244, .72);
-            --shadow: 0 18px 40px rgba(0, 0, 0, .38);
-            --shadow2: 0 10px 22px rgba(0, 0, 0, .28);
-            --ring: 0 0 0 3px rgba(200, 182, 255, .22);
-        }
+    /* =========================
+       PARALLAX (Premium)
+       ========================= */
+    .hero::before,
+    .splash::before{
+      will-change: transform;
+      transform: translate3d(calc(var(--px) * .35), calc(var(--py) * .35), 0) scale(1.03);
+    }
+    .hero::after,
+    .splash::after{
+      will-change: transform;
+      transform: translate3d(calc(var(--px) * .18), calc(var(--py) * .18), 0);
+    }
 
-        * {
-            box-sizing: border-box;
-        }
+    /* Parallax sur les images des slides (important, car .slides::before est désactivé) */
+    .slide::before{
+      will-change: transform;
+      transform: translate3d(calc(var(--px) * .18), calc(var(--py) * .18), 0) scale(1.03);
+    }
 
-        html,
-        body {
-            height: 100%;
-        }
+    .card, .tile, .lesson, .hintCard{
+      will-change: transform;
+      transform: translate3d(calc(var(--px) * .05), calc(var(--py) * .05), 0);
+    }
 
-        body {
-            margin: 0;
-            font-family: var(--font);
-            background: radial-gradient(1200px 900px at 12% 12%, rgba(200, 182, 255, .22), transparent 55%),
-                radial-gradient(1200px 900px at 88% 18%, rgba(79, 109, 245, .18), transparent 55%),
-                var(--bg);
-            color: var(--text);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            overflow-x: hidden;
-        }
+    @media (max-width:480px){
+      .hero::before, .splash::before{
+        transform: translate3d(calc(var(--px) * .18), calc(var(--py) * .18), 0) scale(1.02);
+      }
+      .slide::before{
+        transform: translate3d(calc(var(--px) * .10), calc(var(--py) * .10), 0) scale(1.02);
+      }
+    }
 
-        /* =========================
-   PARALLAX (Premium)
-   ========================= */
+    .app{
+      min-height:100%;
+      display:flex;
+      justify-content:center;
+      padding:18px 14px 92px;
+    }
 
-        /* Déplace légèrement l’image de fond des sections */
-        .hero::before,
-        .splash::before,
-        .slides::before {
-            will-change: transform;
-            transform: translate3d(calc(var(--px) * .35), calc(var(--py) * .35), 0) scale(1.03);
-        }
+    .phone{ width:min(420px, 100%); border-radius:30px; position:relative; }
 
-        /* Déplace aussi un peu l’overlay pour donner de la profondeur */
-        .hero::after,
-        .splash::after,
-        .slides::after {
-            will-change: transform;
-            transform: translate3d(calc(var(--px) * .18), calc(var(--py) * .18), 0);
-        }
+    .screen{
+      background: color-mix(in oklab, var(--panel) 92%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 65%, transparent);
+      box-shadow:var(--shadow);
+      border-radius:30px;
+      overflow:hidden;
+      position:relative;
+    }
 
-        /* “Depth” subtile sur les cartes (mouvement très léger) */
-        .card,
-        .tile,
-        .lesson,
-        .hintCard {
-            will-change: transform;
-            transform: translate3d(calc(var(--px) * .05), calc(var(--py) * .05), 0);
-        }
-
-        /* Mobile: effet plus faible (évite le côté “trop mouvant”) */
-        @media (max-width: 480px) {
-
-            .hero::before,
-            .splash::before,
-            .slides::before {
-                transform: translate3d(calc(var(--px) * .18), calc(var(--py) * .18), 0) scale(1.02);
-            }
-        }
-
-
-        .app {
-            min-height: 100%;
-            display: flex;
-            justify-content: center;
-            padding: 18px 14px 92px;
-        }
-
-        .phone {
-            width: min(420px, 100%);
-            border-radius: 30px;
-            position: relative;
-        }
-
-        .screen {
-            background: color-mix(in oklab, var(--panel) 92%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 65%, transparent);
-            box-shadow: var(--shadow);
-            border-radius: 30px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* -------------------------
-       ✅ HERO / HEADER (image + blue overlay)
+    /* -------------------------
+       HERO
        ------------------------- */
-        .hero {
-            padding: 18px;
-            position: relative;
-            overflow: hidden;
-            min-height: 230px;
-            backdrop-filter: saturate(120%);
-        }
+    .hero{
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+      min-height:230px;
+      backdrop-filter:saturate(120%);
+    }
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background-image:var(--img-skyline);
+      background-size:cover;
+      background-position:center;
+      filter:saturate(115%) brightness(0.85);
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg,
+          rgba(10,15,35,0.15) 0%,
+          rgba(10,15,35,0.55) 45%,
+          rgba(10,15,35,0.85) 100%),
+        radial-gradient(circle at 20% 10%, rgba(79,109,245,0.55), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(200,182,255,0.35), transparent 40%);
+    }
+    [data-theme="night"] .hero::after{
+      background:
+        linear-gradient(180deg,
+          rgba(79,109,245,.22),
+          rgba(31,42,68,.55) 55%,
+          rgba(15,21,37,.95) 100%);
+    }
 
-        /* Photo layer */
-        .hero::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: var(--img-skyline);
-            background-size: cover;
-            background-position: center;
-            filter: saturate(115%) brightness(0.85);
-        }
+    .heroContent{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
 
+    .brand{ display:flex; flex-direction:column; gap:4px; }
+    .brand .title{ font-size:15px; letter-spacing:.2px; color:var(--subtext); }
+    .brand .headline{
+      font-size:22px;
+      line-height:1.15;
+      font-weight:720;
+      margin:0;
+      text-shadow: 0 0 8px rgba(79,109,245,0.35), 0 0 16px rgba(79,109,245,0.25);
+    }
+    .brand .headline .kr{
+      font-family:var(--kfont);
+      font-weight:760;
+      display:block;
+      letter-spacing:-.2px;
+      margin-top:6px;
+      font-size:20px;
+      opacity:.98;
+      text-shadow: 0 0 6px rgba(200,182,255,0.45), 0 0 14px rgba(200,182,255,0.35);
+    }
 
-        /* Blue overlay layer (the “K-app” look) */
-        .hero::after {
-            content: "";
-            position: absolute;
-            inset: 0;
+    .pillRow{ display:flex; gap:10px; align-items:center; margin-top:14px; flex-wrap:wrap; }
+    .pill{
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      background: color-mix(in oklab, var(--panel) 74%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 60%, transparent);
+      box-shadow:var(--shadow2);
+      color:var(--subtext);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background:var(--primary);
+      box-shadow:0 0 0 3px color-mix(in oklab, var(--primary) 18%, transparent);
+      flex:0 0 auto;
+    }
+    .dot.purple{
+      background:var(--secondary);
+      box-shadow:0 0 0 3px color-mix(in oklab, var(--secondary) 18%, transparent);
+    }
 
-            background:
-                linear-gradient(180deg,
-                    rgba(10, 15, 35, 0.15) 0%,
-                    rgba(10, 15, 35, 0.55) 45%,
-                    rgba(10, 15, 35, 0.85) 100%),
+    .iconBtn{
+      border:none;
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 60%, transparent);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      box-shadow:var(--shadow2);
+      transition: transform .15s ease, box-shadow .15s ease;
+      user-select:none;
+    }
+    .iconBtn:active{ transform:scale(.98); }
+    .iconBtn:focus{ outline:none; box-shadow:var(--shadow2), var(--ring); }
 
-                radial-gradient(circle at 20% 10%,
-                    rgba(79, 109, 245, 0.55),
-                    transparent 45%),
+    .content{ padding:16px 18px 20px; }
 
-                radial-gradient(circle at 80% 0%,
-                    rgba(200, 182, 255, 0.35),
-                    transparent 40%);
-        }
+    .card{
+      background: color-mix(in oklab, var(--panel) 86%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 62%, transparent);
+      border-radius:var(--radius-xl);
+      box-shadow:var(--shadow2);
+      padding:14px;
+    }
+    .row{ display:flex; gap:12px; align-items:center; justify-content:space-between; }
+    .col{ display:flex; flex-direction:column; gap:6px; }
+    .h2{ margin:0; font-size:16px; font-weight:720; letter-spacing:.1px; }
+    .p{ margin:0; font-size:13px; color:var(--subtext); line-height:1.35; }
 
+    .progressWrap{ margin-top:10px; display:flex; align-items:center; gap:10px; }
+    .bar{
+      height:10px; flex:1; border-radius:999px;
+      background: color-mix(in oklab, var(--muted) 90%, transparent);
+      overflow:hidden;
+      border:1px solid color-mix(in oklab, var(--muted) 70%, transparent);
+    }
+    .bar > span{
+      display:block; height:100%; width:0%;
+      border-radius:999px;
+      background: linear-gradient(90deg, var(--primary), color-mix(in oklab, var(--secondary) 65%, var(--primary)));
+      transition: width .6s cubic-bezier(.2,.8,.2,1);
+    }
+    .pct{ font-size:12px; color:var(--subtext); width:42px; text-align:right; font-variant-numeric:tabular-nums; }
 
-        /* Night theme overlay tweak */
-        [data-theme="night"] .hero::after {
-            background:
-                linear-gradient(180deg,
-                    rgba(79, 109, 245, .22),
-                    rgba(31, 42, 68, .55) 55%,
-                    rgba(15, 21, 37, .95) 100%);
-        }
+    .btnPrimary{
+      width:100%;
+      margin-top:12px;
+      border:none;
+      cursor:pointer;
+      padding:12px 14px;
+      border-radius:16px;
+      font-weight:720;
+      color:white;
+      background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 92%, white), var(--primary));
+      box-shadow:0 14px 24px color-mix(in oklab, var(--primary) 24%, transparent);
+      transition: transform .15s ease, filter .15s ease;
+      user-select:none;
+    }
+    .btnPrimary:active{ transform:scale(.99); filter:brightness(.98); }
+    .btnPrimary:focus{ outline:none; box-shadow:0 14px 24px color-mix(in oklab, var(--primary) 24%, transparent), var(--ring); }
 
-        .heroContent {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-        }
+    .btnGhost{
+      border:1px solid color-mix(in oklab, var(--muted) 65%, transparent);
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      box-shadow:var(--shadow2);
+      transition: transform .15s ease, box-shadow .15s ease;
+      user-select:none;
+    }
+    .btnGhost:active{ transform:scale(.99); }
+    .btnGhost:focus{ outline:none; box-shadow:var(--shadow2), var(--ring); }
 
-        .brand {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .tile{
+      padding:12px;
+      border-radius:var(--radius-lg);
+      background: color-mix(in oklab, var(--panel) 78%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 62%, transparent);
+      box-shadow:var(--shadow2);
+      cursor:pointer;
+      transition: transform .15s ease;
+      user-select:none;
+      min-height:78px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .tile:active{ transform:scale(.99); }
+    .tile .t{ font-weight:740; font-size:13px; }
+    .tile .s{ font-size:12px; color:var(--subtext); line-height:1.25; }
 
-        .brand .title {
-            font-size: 15px;
-            letter-spacing: .2px;
-            color: var(--subtext);
-        }
+    .badge{
+      align-self:flex-start;
+      font-size:11px;
+      padding:6px 8px;
+      border-radius:999px;
+      background: color-mix(in oklab, var(--secondary) 28%, transparent);
+      border:1px solid color-mix(in oklab, var(--secondary) 40%, transparent);
+      color: color-mix(in oklab, var(--text) 85%, var(--secondary));
+    }
 
-        .brand .headline {
-            font-size: 22px;
-            line-height: 1.15;
-            font-weight: 720;
-            margin: 0;
-            text-shadow:
-                0 0 8px rgba(79, 109, 245, 0.35),
-                0 0 16px rgba(79, 109, 245, 0.25);
-        }
+    .nav{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:14px;
+      width:min(420px, calc(100% - 28px));
+      background: color-mix(in oklab, var(--panel) 74%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 62%, transparent);
+      box-shadow:var(--shadow);
+      border-radius:22px;
+      padding:10px;
+      display:flex;
+      gap:8px;
+      backdrop-filter:blur(10px);
+      z-index:50;
+    }
+    .nav button{
+      flex:1;
+      border:none;
+      background:transparent;
+      color:var(--subtext);
+      padding:10px;
+      border-radius:16px;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:4px;
+      font-size:11px;
+      user-select:none;
+    }
+    .nav button[aria-current="page"]{
+      background: color-mix(in oklab, var(--primary) 14%, transparent);
+      color:var(--text);
+      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 18%, transparent);
+    }
+    .nav .ico{
+      width:18px; height:18px; display:inline-block;
+      border-radius:6px;
+      background: color-mix(in oklab, var(--muted) 86%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 60%, transparent);
+    }
+    .nav button[aria-current="page"] .ico{
+      background: color-mix(in oklab, var(--primary) 32%, transparent);
+      border-color: color-mix(in oklab, var(--primary) 25%, transparent);
+    }
 
-        .brand .headline .kr {
-            font-family: var(--kfont);
-            font-weight: 760;
-            display: block;
-            letter-spacing: -.2px;
-            margin-top: 6px;
-            font-size: 20px;
-            opacity: .98;
-            text-shadow:
-                0 0 6px rgba(200, 182, 255, 0.45),
-                0 0 14px rgba(200, 182, 255, 0.35);
-        }
+    .view{ display:none; }
+    .view.active{ display:block; animation: fadeUp .24s ease both; }
+    @keyframes fadeUp{
+      from{ opacity:0; transform:translateY(10px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
 
-        .pillRow {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 14px;
-            flex-wrap: wrap;
-        }
-
-        .pill {
-            padding: 8px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            background: color-mix(in oklab, var(--panel) 74%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 60%, transparent);
-            box-shadow: var(--shadow2);
-            color: var(--subtext);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--primary);
-            box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 18%, transparent);
-            flex: 0 0 auto;
-        }
-
-        .dot.purple {
-            background: var(--secondary);
-            box-shadow: 0 0 0 3px color-mix(in oklab, var(--secondary) 18%, transparent);
-        }
-
-        .iconBtn {
-            border: none;
-            background: color-mix(in oklab, var(--panel) 70%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 60%, transparent);
-            color: var(--text);
-            padding: 10px 12px;
-            border-radius: 14px;
-            cursor: pointer;
-            box-shadow: var(--shadow2);
-            transition: transform .15s ease, box-shadow .15s ease;
-            user-select: none;
-        }
-
-        .iconBtn:active {
-            transform: scale(.98);
-        }
-
-        .iconBtn:focus {
-            outline: none;
-            box-shadow: var(--shadow2), var(--ring);
-        }
-
-        .content {
-            padding: 16px 18px 20px;
-        }
-
-        .card {
-            background: color-mix(in oklab, var(--panel) 86%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 62%, transparent);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow2);
-            padding: 14px;
-        }
-
-        .row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .col {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .h2 {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 720;
-            letter-spacing: .1px;
-        }
-
-        .p {
-            margin: 0;
-            font-size: 13px;
-            color: var(--subtext);
-            line-height: 1.35;
-        }
-
-        .progressWrap {
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .bar {
-            height: 10px;
-            flex: 1;
-            border-radius: 999px;
-            background: color-mix(in oklab, var(--muted) 90%, transparent);
-            overflow: hidden;
-            border: 1px solid color-mix(in oklab, var(--muted) 70%, transparent);
-        }
-
-        .bar>span {
-            display: block;
-            height: 100%;
-            width: 0%;
-            border-radius: 999px;
-            background: linear-gradient(90deg, var(--primary), color-mix(in oklab, var(--secondary) 65%, var(--primary)));
-            transition: width .6s cubic-bezier(.2, .8, .2, 1);
-        }
-
-        .pct {
-            font-size: 12px;
-            color: var(--subtext);
-            width: 42px;
-            text-align: right;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .btnPrimary {
-            width: 100%;
-            margin-top: 12px;
-            border: none;
-            cursor: pointer;
-            padding: 12px 14px;
-            border-radius: 16px;
-            font-weight: 720;
-            color: white;
-            background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 92%, white), var(--primary));
-            box-shadow: 0 14px 24px color-mix(in oklab, var(--primary) 24%, transparent);
-            transition: transform .15s ease, filter .15s ease;
-            user-select: none;
-        }
-
-        .btnPrimary:active {
-            transform: scale(.99);
-            filter: brightness(.98);
-        }
-
-        .btnPrimary:focus {
-            outline: none;
-            box-shadow: 0 14px 24px color-mix(in oklab, var(--primary) 24%, transparent), var(--ring);
-        }
-
-        .btnGhost {
-            border: 1px solid color-mix(in oklab, var(--muted) 65%, transparent);
-            background: color-mix(in oklab, var(--panel) 70%, transparent);
-            color: var(--text);
-            padding: 10px 12px;
-            border-radius: 14px;
-            cursor: pointer;
-            box-shadow: var(--shadow2);
-            transition: transform .15s ease, box-shadow .15s ease;
-            user-select: none;
-        }
-
-        .btnGhost:active {
-            transform: scale(.99);
-        }
-
-        .btnGhost:focus {
-            outline: none;
-            box-shadow: var(--shadow2), var(--ring);
-        }
-
-        .grid {
-            margin-top: 14px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .tile {
-            padding: 12px;
-            border-radius: var(--radius-lg);
-            background: color-mix(in oklab, var(--panel) 78%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 62%, transparent);
-            box-shadow: var(--shadow2);
-            cursor: pointer;
-            transition: transform .15s ease;
-            user-select: none;
-            min-height: 78px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 8px;
-        }
-
-        .tile:active {
-            transform: scale(.99);
-        }
-
-        .tile .t {
-            font-weight: 740;
-            font-size: 13px;
-        }
-
-        .tile .s {
-            font-size: 12px;
-            color: var(--subtext);
-            line-height: 1.25;
-        }
-
-        .badge {
-            align-self: flex-start;
-            font-size: 11px;
-            padding: 6px 8px;
-            border-radius: 999px;
-            background: color-mix(in oklab, var(--secondary) 28%, transparent);
-            border: 1px solid color-mix(in oklab, var(--secondary) 40%, transparent);
-            color: color-mix(in oklab, var(--text) 85%, var(--secondary));
-        }
-
-        .nav {
-            position: fixed;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: 14px;
-            width: min(420px, calc(100% - 28px));
-            background: color-mix(in oklab, var(--panel) 74%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 62%, transparent);
-            box-shadow: var(--shadow);
-            border-radius: 22px;
-            padding: 10px 10px;
-            display: flex;
-            gap: 8px;
-            backdrop-filter: blur(10px);
-            z-index: 50;
-        }
-
-        .nav button {
-            flex: 1;
-            border: none;
-            background: transparent;
-            color: var(--subtext);
-            padding: 10px 10px;
-            border-radius: 16px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            font-size: 11px;
-            user-select: none;
-        }
-
-        .nav button[aria-current="page"] {
-            background: color-mix(in oklab, var(--primary) 14%, transparent);
-            color: var(--text);
-            box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 18%, transparent);
-        }
-
-        .nav .ico {
-            width: 18px;
-            height: 18px;
-            display: inline-block;
-            border-radius: 6px;
-            background: color-mix(in oklab, var(--muted) 86%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 60%, transparent);
-        }
-
-        .nav button[aria-current="page"] .ico {
-            background: color-mix(in oklab, var(--primary) 32%, transparent);
-            border-color: color-mix(in oklab, var(--primary) 25%, transparent);
-        }
-
-        .view {
-            display: none;
-        }
-
-        .view.active {
-            display: block;
-            animation: fadeUp .24s ease both;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* -------------------------
-       ✅ SPLASH (café image + blue overlay)
+    /* -------------------------
+       SPLASH
        ------------------------- */
-        .splash {
-            min-height: 620px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 42px 18px;
-            position: relative;
-            overflow: hidden;
-        }
+    .splash{
+      min-height:620px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      padding:42px 18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .splash::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background-image:var(--img-cafe);
+      background-size:cover;
+      background-position:center;
+      transform: scale(1.02);
+      filter:none;
+    }
+    .splash::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(79,109,245,.55), transparent 45%),
+        radial-gradient(circle at 82% 10%, rgba(200,182,255,.38), transparent 42%),
+        linear-gradient(180deg, rgba(10,15,35,.25) 0%, rgba(10,15,35,.62) 52%, rgba(250,250,250,.92) 100%);
+      backdrop-filter:none;
+    }
+    [data-theme="night"] .splash::after{
+      background:
+        radial-gradient(900px 600px at 20% 10%, rgba(79,109,245,.18), transparent 55%),
+        linear-gradient(180deg, rgba(31,42,68,.55), rgba(15,21,37,.95));
+    }
 
-        .splash::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: var(--img-cafe);
-            background-size: cover;
-            background-position: center;
-            transform: scale(1.02);
-            filter: none
-        }
+    .splash-exit{ animation:splashFade .9s ease forwards; }
+    @keyframes splashFade{
+      0%{ opacity:1; transform:scale(1); }
+      60%{ opacity:.6; transform:scale(1.03); }
+      100%{ opacity:0; transform:scale(1.08); }
+    }
 
-        .splash::after {
-            content: "";
-            position: absolute;
-            inset: 0;
+    .logo{
+      position:relative;
+      z-index:1;
+      width:86px; height:86px;
+      border-radius:26px;
+      background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 90%, white), var(--primary));
+      box-shadow:0 18px 34px color-mix(in oklab, var(--primary) 24%, transparent);
+      display:flex; align-items:center; justify-content:center;
+      color:white;
+      font-weight:850;
+      letter-spacing:-.3px;
+      user-select:none;
+    }
+    .logo small{
+      position:absolute;
+      bottom:9px;
+      font-size:10px;
+      font-weight:700;
+      opacity:.85;
+      letter-spacing:.25px;
+    }
 
-            /* 🌃 Néon night overlay (sans flou) */
-            background:
-                radial-gradient(circle at 18% 12%, rgba(79, 109, 245, .55), transparent 45%),
-                radial-gradient(circle at 82% 10%, rgba(200, 182, 255, .38), transparent 42%),
-                linear-gradient(180deg,
-                    rgba(10, 15, 35, .25) 0%,
-                    rgba(10, 15, 35, .62) 52%,
-                    rgba(250, 250, 250, .92) 100%);
+    .splash h1{
+      position:relative; z-index:1;
+      margin:18px 0 8px;
+      font-size:22px;
+      font-weight:820;
+      letter-spacing:-.2px;
+      color:var(--text);
+      text-shadow:0 0 10px rgba(79,109,245,.25);
+    }
+    .splash p{
+      position:relative; z-index:1;
+      margin:0;
+      max-width:260px;
+      color:var(--subtext);
+      font-size:13px;
+      line-height:1.35;
+      text-shadow:0 0 10px rgba(0,0,0,.12);
+    }
 
-            backdrop-filter: none;
-            /* ✅ IMPORTANT */
-        }
+    .pulse{
+      position:relative; z-index:1;
+      margin-top:22px;
+      width:12px; height:12px;
+      border-radius:50%;
+      background:var(--secondary);
+      box-shadow:0 0 0 0 rgba(200,182,255,.35);
+      animation:pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%{ box-shadow:0 0 0 0 rgba(200,182,255,.35); transform:scale(1); }
+      70%{ box-shadow:0 0 0 18px rgba(200,182,255,0); transform:scale(1.08); }
+      100%{ box-shadow:0 0 0 0 rgba(200,182,255,0); transform:scale(1); }
+    }
 
-        /* SPLASH EXIT ANIMATION */
-        .splash-exit {
-            animation: splashFade 0.9s ease forwards;
-        }
-
-        @keyframes splashFade {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            60% {
-                opacity: 0.6;
-                transform: scale(1.03);
-            }
-
-            100% {
-                opacity: 0;
-                transform: scale(1.08);
-            }
-        }
-
-
-
-        [data-theme="night"] .splash::after {
-            background:
-                radial-gradient(900px 600px at 20% 10%, rgba(79, 109, 245, .18), transparent 55%),
-                linear-gradient(180deg, rgba(31, 42, 68, .55), rgba(15, 21, 37, .95));
-        }
-
-        .logo {
-            position: relative;
-            z-index: 1;
-            width: 86px;
-            height: 86px;
-            border-radius: 26px;
-            background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 90%, white), var(--primary));
-            box-shadow: 0 18px 34px color-mix(in oklab, var(--primary) 24%, transparent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 850;
-            letter-spacing: -.3px;
-            user-select: none;
-        }
-
-        .logo small {
-            position: absolute;
-            bottom: 9px;
-            font-size: 10px;
-            font-weight: 700;
-            opacity: .85;
-            letter-spacing: .25px;
-        }
-
-        .splash h1 {
-            position: relative;
-            z-index: 1;
-            margin: 18px 0 8px;
-            font-size: 22px;
-            font-weight: 820;
-            letter-spacing: -.2px;
-            color: var(--text);
-            text-shadow: 0 0 10px rgba(79, 109, 245, .25);
-        }
-
-        .splash p {
-            position: relative;
-            z-index: 1;
-            margin: 0;
-            max-width: 260px;
-            color: var(--subtext);
-            font-size: 13px;
-            line-height: 1.35;
-            text-shadow: 0 0 10px rgba(0, 0, 0, .12);
-        }
-
-        .pulse {
-            position: relative;
-            z-index: 1;
-            margin-top: 22px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--secondary);
-            box-shadow: 0 0 0 0 rgba(200, 182, 255, .35);
-            animation: pulse 1.2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(200, 182, 255, .35);
-                transform: scale(1);
-            }
-
-            70% {
-                box-shadow: 0 0 0 18px rgba(200, 182, 255, 0);
-                transform: scale(1.08);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(200, 182, 255, 0);
-                transform: scale(1);
-            }
-        }
-
-        /* -------------------------
-       ✅ ONBOARDING (slide area uses skyline/cafe images + overlay)
+    /* -------------------------
+       ONBOARDING
        ------------------------- */
-        .onboard {
-            padding: 18px;
-            min-height: 620px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
+    .onboard{
+      padding:18px;
+      min-height:620px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
 
-        .slides {
-            flex: 1;
-            border-radius: 26px;
-            overflow: hidden;
-            border: 1px solid color-mix(in oklab, var(--muted) 65%, transparent);
-            box-shadow: var(--shadow2);
-            position: relative;
-            background: #000;
-        }
+    .slides{
+      flex:1;
+      border-radius:26px;
+      overflow:hidden;
+      border:1px solid color-mix(in oklab, var(--muted) 65%, transparent);
+      box-shadow:var(--shadow2);
+      position:relative;
+      background:#000;
+      touch-action: pan-y; /* swipe horizontal géré en JS */
+      user-select:none;
+      -webkit-user-select:none;
+    }
 
-        .slides::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: none !important;
-            /* ✅ plus d'image globale */
-        }
+    /* Désactivé: plus de background global (chaque slide a son image) */
+    .slides::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:none !important;
+    }
 
-        .slides::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(180deg,
-                    rgba(79, 109, 245, .30),
-                    rgba(31, 42, 68, .22) 50%,
-                    rgba(250, 250, 250, .92) 100%);
-            backdrop-filter: blur(1px);
-        }
+    /* Overlay global (lisibilité) — sans blur pour éviter rendu “lavé” en drag */
+    .slides::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg,
+          rgba(79,109,245,.18),
+          rgba(31,42,68,.14) 50%,
+          rgba(250,250,250,.90) 100%);
+      pointer-events:none;
+    }
+    [data-theme="night"] .slides::after{
+      background:
+        linear-gradient(180deg,
+          rgba(79,109,245,.18),
+          rgba(31,42,68,.60) 55%,
+          rgba(15,21,37,.95) 100%);
+    }
 
-        [data-theme="night"] .slides::after {
-            background:
-                linear-gradient(180deg,
-                    rgba(79, 109, 245, .18),
-                    rgba(31, 42, 68, .60) 55%,
-                    rgba(15, 21, 37, .95) 100%);
-        }
+    .slide{
+      position:absolute;
+      inset:0;
+      z-index:1;
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      gap:10px;
 
-        .slide {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            gap: 10px;
-            opacity: 0;
-            transform: translateX(14px);
-            transition: opacity .22s ease, transform .22s ease;
-        }
+      overflow:hidden;
+      border-radius:26px;
 
-        /* slide 2 uses cafe image for variety */
-        .slide[data-slide="1"]::before {
-            content: "";
-            position: absolute;
-            inset: -20px;
-            background-image: var(--img-cafe);
-            background-size: cover;
-            background-position: center;
-            transform: scale(1.08);
-            filter: blur(1px);
-            opacity: .55;
-            z-index: -1;
-        }
+      opacity:0;
+      transform:translateX(14px);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .slide.active{
+      opacity:1;
+      transform:translateX(0);
+    }
 
-        .slide.active {
-            opacity: 1;
-            transform: translateX(0);
-        }
+    /* Image par slide (NET) */
+    .slide::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background-image:var(--img-skyline);
+      background-size:cover;
+      background-position:center;
+      z-index:-2;
+    }
 
-        .slide .k {
-            font-family: var(--kfont);
-            font-weight: 820;
-            font-size: 18px;
-            letter-spacing: -.2px;
-        }
+    /* Overlay local (un peu de contraste + “premium”) */
+    .slide::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-1;
+      background:
+        linear-gradient(180deg,
+          rgba(10,15,35,.08) 0%,
+          rgba(10,15,35,.18) 52%,
+          rgba(255,255,255,.90) 100%);
+    }
 
-        .slide h2 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 820;
-            letter-spacing: -.2px;
-        }
+    /* Slide 2 image café */
+    .slide[data-slide="1"]::before{ background-image:var(--img-cafe); }
+    /* Slide 3 skyline (déjà default) */
+    .slide[data-slide="2"]::before{ background-image:var(--img-skyline); }
 
-        /* Permet le swipe sans bug et empêche la sélection */
-        .slides {
-            touch-action: pan-y;
-            /* autorise scroll vertical, on gère l'horizontal */
-            user-select: none;
-            -webkit-user-select: none;
-        }
+    .slide .k{
+      font-family:var(--kfont);
+      font-weight:820;
+      font-size:18px;
+      letter-spacing:-.2px;
+    }
+    .slide h2{
+      margin:0;
+      font-size:18px;
+      font-weight:820;
+      letter-spacing:-.2px;
+    }
 
-        /* Chaque slide devient une “carte” avec sa propre image */
-        .slide {
-            overflow: hidden;
-            border-radius: 26px;
-        }
+    .dots{ display:flex; justify-content:center; gap:8px; }
+    .dots span{
+      width:8px; height:8px;
+      border-radius:999px;
+      background: color-mix(in oklab, var(--muted) 90%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 65%, transparent);
+    }
+    .dots span.active{
+      width:22px;
+      background: color-mix(in oklab, var(--primary) 30%, transparent);
+      border-color: color-mix(in oklab, var(--primary) 30%, transparent);
+    }
 
-        /* Image par slide (nette, sans blur) */
-        .slide::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: var(--img-skyline);
-            /* défaut */
-            background-size: cover;
-            background-position: center;
-            transform: scale(1.03);
-            z-index: -2;
-        }
+    /* Lists / lesson / immersion */
+    .list{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+    .lesson{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding:12px;
+      border-radius:var(--radius-lg);
+      background: color-mix(in oklab, var(--panel) 78%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 62%, transparent);
+      box-shadow:var(--shadow2);
+      cursor:pointer;
+      user-select:none;
+    }
+    .lesson .num{
+      width:34px; height:34px;
+      border-radius:12px;
+      background: color-mix(in oklab, var(--primary) 16%, transparent);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:820;
+      border:1px solid color-mix(in oklab, var(--primary) 20%, transparent);
+      flex:0 0 auto;
+    }
+    .lesson .meta{ flex:1; display:flex; flex-direction:column; gap:2px; }
+    .lesson .meta .name{ font-weight:780; font-size:13px; }
+    .lesson .meta .desc{ font-size:12px; color:var(--subtext); }
 
-        /* Overlay (lisibilité + ambiance) */
-        .slide::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            z-index: -1;
-            background:
-                linear-gradient(180deg,
-                    rgba(10, 15, 35, .10) 0%,
-                    rgba(10, 15, 35, .25) 50%,
-                    rgba(255, 255, 255, .90) 100%);
-        }
+    .chip{
+      font-size:11px;
+      padding:6px 8px;
+      border-radius:999px;
+      background: color-mix(in oklab, var(--muted) 85%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 60%, transparent);
+      color:var(--subtext);
+      flex:0 0 auto;
+    }
 
-        /* Slide 2/3 avec une autre image (café) */
-        .slide[data-slide="1"]::before {
-            background-image: var(--img-cafe);
-        }
+    .topBar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 18px 0;
+      gap:10px;
+    }
+    .backBtn{
+      border:none;
+      background:transparent;
+      cursor:pointer;
+      color:var(--subtext);
+      font-weight:700;
+      padding:10px;
+      border-radius:14px;
+    }
+    .backBtn:focus{ outline:none; box-shadow:var(--ring); }
+    .pageTitle{ font-weight:820; letter-spacing:-.2px; margin:0; font-size:14px; color:var(--text); }
 
-        .slide[data-slide="2"]::before {
-            background-image: var(--img-skyline);
-        }
+    .krBig{
+      font-family:var(--kfont);
+      font-size:34px;
+      font-weight:900;
+      letter-spacing:-.5px;
+      margin:6px 0 2px;
+    }
+    .roman{ font-size:13px; color:var(--subtext); margin:0 0 6px; }
+    .meaning{ font-size:15px; font-weight:760; margin:0 0 10px; }
 
+    .hintCard{
+      margin-top:10px;
+      padding:12px;
+      border-radius:var(--radius-lg);
+      background: color-mix(in oklab, var(--panel) 78%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 62%, transparent);
+      box-shadow:var(--shadow2);
+    }
+    .hintCard .k{ font-family:var(--kfont); font-weight:760; }
 
-        .dots {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
+    .audioRow{ display:flex; gap:10px; align-items:center; }
+    .choices{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+    .choice{
+      border:none;
+      text-align:left;
+      padding:12px;
+      border-radius:var(--radius-lg);
+      background: color-mix(in oklab, var(--panel) 78%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 62%, transparent);
+      box-shadow:var(--shadow2);
+      cursor:pointer;
+      color:var(--text);
+      font-weight:730;
+      user-select:none;
+      transition: transform .15s ease;
+    }
+    .choice:active{ transform:scale(.995); }
+    .choice.correct{
+      border-color: color-mix(in oklab, var(--primary) 45%, transparent);
+      box-shadow: var(--shadow2), 0 0 0 3px color-mix(in oklab, var(--primary) 14%, transparent);
+    }
+    .choice.wrong{
+      border-color: rgba(255,90,90,.45);
+      box-shadow: var(--shadow2), 0 0 0 3px rgba(255,90,90,.12);
+    }
 
-        .dots span {
-            width: 8px;
-            height: 8px;
-            border-radius: 999px;
-            background: color-mix(in oklab, var(--muted) 90%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 65%, transparent);
-        }
+    .toast{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:12px;
+      background: color-mix(in oklab, var(--muted) 85%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 60%, transparent);
+      color:var(--subtext);
+      display:none;
+    }
+    .toast.show{ display:block; animation: fadeUp .18s ease both; }
 
-        .dots span.active {
-            width: 22px;
-            background: color-mix(in oklab, var(--primary) 30%, transparent);
-            border-color: color-mix(in oklab, var(--primary) 30%, transparent);
-        }
+    .immersionTop{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .timer{ font-variant-numeric:tabular-nums; font-size:18px; font-weight:860; letter-spacing:-.2px; }
 
-        /* Rest (lists, lesson, immersion) — inchangé par rapport au prototype précédent */
-        .list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 12px;
-        }
+    .toggles{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+    .toggle{
+      padding:12px;
+      border-radius:var(--radius-lg);
+      background: color-mix(in oklab, var(--panel) 78%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 62%, transparent);
+      box-shadow:var(--shadow2);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .switch{
+      width:44px; height:26px;
+      border-radius:999px;
+      background: color-mix(in oklab, var(--muted) 88%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 60%, transparent);
+      position:relative;
+      flex:0 0 auto;
+    }
+    .switch::after{
+      content:"";
+      position:absolute;
+      top:3px; left:3px;
+      width:20px; height:20px;
+      border-radius:999px;
+      background:var(--panel);
+      box-shadow:var(--shadow2);
+      transition:left .18s ease, background .18s ease;
+    }
+    .toggle[data-on="true"] .switch{
+      background: color-mix(in oklab, var(--primary) 35%, transparent);
+      border-color: color-mix(in oklab, var(--primary) 32%, transparent);
+    }
+    .toggle[data-on="true"] .switch::after{
+      left:21px;
+      background: color-mix(in oklab, var(--primary) 86%, white);
+    }
 
-        .lesson {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            padding: 12px;
-            border-radius: var(--radius-lg);
-            background: color-mix(in oklab, var(--panel) 78%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 62%, transparent);
-            box-shadow: var(--shadow2);
-            cursor: pointer;
-            user-select: none;
-        }
+    .ambientLine{
+      margin-top:12px;
+      padding:12px;
+      border-radius:var(--radius-lg);
+      background: color-mix(in oklab, var(--panel) 72%, transparent);
+      border:1px solid color-mix(in oklab, var(--muted) 62%, transparent);
+      box-shadow:var(--shadow2);
+      color:var(--subtext);
+      font-size:12px;
+      line-height:1.35;
+    }
 
-        .lesson .num {
-            width: 34px;
-            height: 34px;
-            border-radius: 12px;
-            background: color-mix(in oklab, var(--primary) 16%, transparent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 820;
-            border: 1px solid color-mix(in oklab, var(--primary) 20%, transparent);
-            flex: 0 0 auto;
-        }
-
-        .lesson .meta {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .lesson .meta .name {
-            font-weight: 780;
-            font-size: 13px;
-        }
-
-        .lesson .meta .desc {
-            font-size: 12px;
-            color: var(--subtext);
-        }
-
-        .chip {
-            font-size: 11px;
-            padding: 6px 8px;
-            border-radius: 999px;
-            background: color-mix(in oklab, var(--muted) 85%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 60%, transparent);
-            color: var(--subtext);
-            flex: 0 0 auto;
-        }
-
-        .topBar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 18px 0;
-            gap: 10px;
-        }
-
-        .backBtn {
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            color: var(--subtext);
-            font-weight: 700;
-            padding: 10px 10px;
-            border-radius: 14px;
-        }
-
-        .backBtn:focus {
-            outline: none;
-            box-shadow: var(--ring);
-        }
-
-        .pageTitle {
-            font-weight: 820;
-            letter-spacing: -.2px;
-            margin: 0;
-            font-size: 14px;
-            color: var(--text);
-        }
-
-        .krBig {
-            font-family: var(--kfont);
-            font-size: 34px;
-            font-weight: 900;
-            letter-spacing: -.5px;
-            margin: 6px 0 2px;
-        }
-
-        .roman {
-            font-size: 13px;
-            color: var(--subtext);
-            margin: 0 0 6px;
-        }
-
-        .meaning {
-            font-size: 15px;
-            font-weight: 760;
-            margin: 0 0 10px;
-        }
-
-        .hintCard {
-            margin-top: 10px;
-            padding: 12px;
-            border-radius: var(--radius-lg);
-            background: color-mix(in oklab, var(--panel) 78%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 62%, transparent);
-            box-shadow: var(--shadow2);
-        }
-
-        .hintCard .k {
-            font-family: var(--kfont);
-            font-weight: 760;
-        }
-
-        .audioRow {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .choices {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .choice {
-            border: none;
-            text-align: left;
-            padding: 12px;
-            border-radius: var(--radius-lg);
-            background: color-mix(in oklab, var(--panel) 78%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 62%, transparent);
-            box-shadow: var(--shadow2);
-            cursor: pointer;
-            color: var(--text);
-            font-weight: 730;
-            user-select: none;
-            transition: transform .15s ease;
-        }
-
-        .choice:active {
-            transform: scale(.995);
-        }
-
-        .choice.correct {
-            border-color: color-mix(in oklab, var(--primary) 45%, transparent);
-            box-shadow: var(--shadow2), 0 0 0 3px color-mix(in oklab, var(--primary) 14%, transparent);
-        }
-
-        .choice.wrong {
-            border-color: rgba(255, 90, 90, .45);
-            box-shadow: var(--shadow2), 0 0 0 3px rgba(255, 90, 90, .12);
-        }
-
-        .toast {
-            margin-top: 12px;
-            padding: 10px 12px;
-            border-radius: 14px;
-            font-size: 12px;
-            background: color-mix(in oklab, var(--muted) 85%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 60%, transparent);
-            color: var(--subtext);
-            display: none;
-        }
-
-        .toast.show {
-            display: block;
-            animation: fadeUp .18s ease both;
-        }
-
-        .immersionTop {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .timer {
-            font-variant-numeric: tabular-nums;
-            font-size: 18px;
-            font-weight: 860;
-            letter-spacing: -.2px;
-        }
-
-        .toggles {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .toggle {
-            padding: 12px;
-            border-radius: var(--radius-lg);
-            background: color-mix(in oklab, var(--panel) 78%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 62%, transparent);
-            box-shadow: var(--shadow2);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .switch {
-            width: 44px;
-            height: 26px;
-            border-radius: 999px;
-            background: color-mix(in oklab, var(--muted) 88%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 60%, transparent);
-            position: relative;
-            flex: 0 0 auto;
-        }
-
-        .switch::after {
-            content: "";
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 20px;
-            height: 20px;
-            border-radius: 999px;
-            background: var(--panel);
-            box-shadow: var(--shadow2);
-            transition: left .18s ease, background .18s ease;
-        }
-
-        .toggle[data-on="true"] .switch {
-            background: color-mix(in oklab, var(--primary) 35%, transparent);
-            border-color: color-mix(in oklab, var(--primary) 32%, transparent);
-        }
-
-        .toggle[data-on="true"] .switch::after {
-            left: 21px;
-            background: color-mix(in oklab, var(--primary) 86%, white);
-        }
-
-        .ambientLine {
-            margin-top: 12px;
-            padding: 12px;
-            border-radius: var(--radius-lg);
-            background: color-mix(in oklab, var(--panel) 72%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 62%, transparent);
-            box-shadow: var(--shadow2);
-            color: var(--subtext);
-            font-size: 12px;
-            line-height: 1.35;
-        }
-
-        /* =========================
-   HALO LUMINEUX (Premium)
-   ========================= */
-
-        /* Un wrapper glow pour toutes les cards */
-        .card,
-        .tile,
-        .lesson,
-        .hintCard {
-            position: relative;
-            isolation: isolate;
-            /* important pour que le halo reste derrière */
-        }
-
-        /* Halo bleu/violet doux derrière */
-        .card::before,
-        .tile::before,
-        .lesson::before,
-        .hintCard::before {
-            content: "";
-            position: absolute;
-            inset: -18px;
-            z-index: -1;
-            border-radius: inherit;
-
-            background:
-                radial-gradient(circle at 18% 22%, rgba(79, 109, 245, .30), transparent 55%),
-                radial-gradient(circle at 82% 18%, rgba(200, 182, 255, .22), transparent 52%),
-                radial-gradient(circle at 50% 85%, rgba(79, 109, 245, .12), transparent 60%);
-
-            filter: blur(14px);
-            opacity: .65;
-            transform: translateZ(0);
-            transition: opacity .25s ease, filter .25s ease;
-        }
-
-        /* Survol (desktop) -> un peu plus “premium” */
-        @media (hover:hover) {
-
-            .card:hover::before,
-            .tile:hover::before,
-            .lesson:hover::before,
-            .hintCard:hover::before {
-                opacity: .9;
-                filter: blur(16px);
-            }
-        }
-
-        /* Mode nuit : halo plus présent mais pas agressif */
-        [data-theme="night"] .card::before,
-        [data-theme="night"] .tile::before,
-        [data-theme="night"] .lesson::before,
-        [data-theme="night"] .hintCard::before {
-            opacity: .85;
-        }
-
-        /* Petit “shine” discret (lumière) */
-        .card::after,
-        .tile::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            pointer-events: none;
-            background:
-                linear-gradient(135deg,
-                    rgba(255, 255, 255, .22) 0%,
-                    rgba(255, 255, 255, .08) 22%,
-                    rgba(255, 255, 255, 0) 45%);
-
-            opacity: .45;
-            mix-blend-mode: screen;
-        }
-
-        [data-theme="night"] .card::after,
-        [data-theme="night"] .tile::after {
-            opacity: .22;
-        }
-    </style>
+    /* =========================
+       HALO LUMINEUX (Premium)
+       ========================= */
+    .card, .tile, .lesson, .hintCard{
+      position:relative;
+      isolation:isolate;
+    }
+    .card::before, .tile::before, .lesson::before, .hintCard::before{
+      content:"";
+      position:absolute;
+      inset:-18px;
+      z-index:-1;
+      border-radius:inherit;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(79,109,245,.30), transparent 55%),
+        radial-gradient(circle at 82% 18%, rgba(200,182,255,.22), transparent 52%),
+        radial-gradient(circle at 50% 85%, rgba(79,109,245,.12), transparent 60%);
+      filter:blur(14px);
+      opacity:.65;
+      transform:translateZ(0);
+      transition: opacity .25s ease, filter .25s ease;
+    }
+    @media (hover:hover){
+      .card:hover::before, .tile:hover::before, .lesson:hover::before, .hintCard:hover::before{
+        opacity:.9;
+        filter:blur(16px);
+      }
+    }
+    [data-theme="night"] .card::before,
+    [data-theme="night"] .tile::before,
+    [data-theme="night"] .lesson::before,
+    [data-theme="night"] .hintCard::before{
+      opacity:.85;
+    }
+    .card::after, .tile::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      pointer-events:none;
+      background:
+        linear-gradient(135deg,
+          rgba(255,255,255,.22) 0%,
+          rgba(255,255,255,.08) 22%,
+          rgba(255,255,255,0) 45%);
+      opacity:.45;
+      mix-blend-mode:screen;
+    }
+    [data-theme="night"] .card::after,
+    [data-theme="night"] .tile::after{
+      opacity:.22;
+    }
+  </style>
 </head>
 
 <body>
-    <div class="app">
-        <div class="phone">
-            <div class="screen" id="screen" data-theme="day">
+  <div class="app">
+    <div class="phone">
+      <div class="screen" id="screen" data-theme="day">
 
-                <!-- SPLASH -->
-                <section class="view active" id="view-splash" aria-label="Splash">
-                    <div class="splash">
-                        <div class="logo" aria-hidden="true">Se<small>KR</small></div>
-                        <h1>Study Korean in Seoul</h1>
-                        <p>Apprends le coréen réel, dans une ambiance café à Séoul.</p>
-                        <div class="pulse" aria-hidden="true"></div>
-                    </div>
-                </section>
+        <!-- SPLASH -->
+        <section class="view active" id="view-splash" aria-label="Splash">
+          <div class="splash">
+            <div class="logo" aria-hidden="true">Se<small>KR</small></div>
+            <h1>Study Korean in Seoul</h1>
+            <p>Apprends le coréen réel, dans une ambiance café à Séoul.</p>
+            <div class="pulse" aria-hidden="true"></div>
+          </div>
+        </section>
 
-                <!-- ONBOARDING -->
-                <section class="view" id="view-onboarding" aria-label="Onboarding">
-                    <div class="onboard">
-                        <div class="slides" role="region" aria-label="Slides">
-                            <div class="slide active" data-slide="0">
-                                <div class="k">서울 감성</div>
-                                <h2>Apprends le coréen réel</h2>
-                                <p class="p">Des phrases utiles, naturelles, comme dans la vraie vie.</p>
-                            </div>
-                            <div class="slide" data-slide="1">
-                                <div class="k">5분이면 충분해요</div>
-                                <h2>5 minutes par jour</h2>
-                                <p class="p">Micro-leçons claires, sans surcharge.</p>
-                            </div>
-                            <div class="slide" data-slide="2">
-                                <div class="k">여행 준비 끝</div>
-                                <h2>Prépare ton voyage</h2>
-                                <p class="p">Café, métro, politesse, mini dialogues : tu es prêt.</p>
-                            </div>
-                        </div>
-
-                        <div class="dots" aria-label="Pagination">
-                            <span class="active" data-dot="0"></span>
-                            <span data-dot="1"></span>
-                            <span data-dot="2"></span>
-                        </div>
-
-                        <div class="row">
-                            <button class="btnGhost" id="btn-skip">Passer</button>
-                            <button class="btnPrimary" id="btn-next">Continuer</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- HOME -->
-                <section class="view" id="view-home" aria-label="Home">
-                    <div class="hero">
-                        <div class="heroContent">
-                            <div class="brand">
-                                <div class="title">Bonsoir 🌙</div>
-                                <h1 class="headline">Prêt pour 5 minutes ?
-                                    <span class="kr">오늘도 한국어 공부해요</span>
-                                </h1>
-                                <div class="pillRow">
-                                    <div class="pill"><span class="dot"></span>Streak <b id="streak">1</b> jour</div>
-                                    <div class="pill"><span class="dot purple"></span>Mot du jour <b
-                                            id="wordOfDay">괜찮아요</b></div>
-                                </div>
-                            </div>
-                            <button class="iconBtn" id="btn-theme" title="Mode nuit / jour"
-                                aria-label="Basculer thème">🌗</button>
-                        </div>
-                    </div>
-
-                    <div class="content">
-                        <div class="card">
-                            <div class="row">
-                                <div class="col">
-                                    <p class="p" style="margin:0;">Niveau 3 — survivre à Séoul</p>
-                                    <h2 class="h2" style="margin:0;">Progression</h2>
-                                </div>
-                                <div class="chip" id="levelChip">65%</div>
-                            </div>
-
-                            <div class="progressWrap" aria-label="Progression">
-                                <div class="bar" aria-hidden="true"><span id="progressBar"></span></div>
-                                <div class="pct" id="pct">65%</div>
-                            </div>
-
-                            <button class="btnPrimary" id="btn-continue">▶ Continuer la leçon</button>
-                            <div style="display:flex; gap:10px; margin-top:10px;">
-                                <button class="btnGhost" id="btn-lessons" style="flex:1;">📚 Leçons</button>
-                                <button class="btnGhost" id="btn-immersion" style="flex:1;">☕ Study café</button>
-                            </div>
-                        </div>
-
-                        <div class="grid" aria-label="Modules">
-                            <div class="tile" data-go="lessons">
-                                <div class="badge">Essentiel</div>
-                                <div>
-                                    <div class="t">📘 Hangul</div>
-                                    <div class="s">Apprendre à lire vite</div>
-                                </div>
-                            </div>
-                            <div class="tile" data-go="lessons">
-                                <div class="badge">Réel</div>
-                                <div>
-                                    <div class="t">🗣 Expressions</div>
-                                    <div class="s">Parler naturellement</div>
-                                </div>
-                            </div>
-                            <div class="tile" data-go="lessons">
-                                <div class="badge">Séoul</div>
-                                <div>
-                                    <div class="t">☕ Café</div>
-                                    <div class="s">Commander & social</div>
-                                </div>
-                            </div>
-                            <div class="tile" data-go="immersion">
-                                <div class="badge">Immersion</div>
-                                <div>
-                                    <div class="t">🌧 Study mode</div>
-                                    <div class="s">Ambiance + focus</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="hintCard" style="margin-top:14px;">
-                            <div class="row">
-                                <div class="col" style="gap:4px;">
-                                    <div class="p">✨ Expression utile</div>
-                                    <div class="h2" style="font-family:var(--kfont);">괜찮아요</div>
-                                    <div class="p">C’est ok / pas de souci</div>
-                                </div>
-                                <button class="iconBtn" id="btn-speak-word" title="Écouter"
-                                    aria-label="Écouter l'expression">🔊</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- LESSONS LIST -->
-                <section class="view" id="view-lessons" aria-label="Leçons">
-                    <div class="topBar">
-                        <button class="backBtn" data-back="home">←</button>
-                        <p class="pageTitle">Leçons essentielles</p>
-                        <button class="iconBtn" id="btn-search" title="Bientôt"
-                            aria-label="Recherche (bientôt)">⌕</button>
-                    </div>
-                    <div class="content">
-                        <div class="card">
-                            <div class="row">
-                                <div class="col" style="gap:4px;">
-                                    <h2 class="h2">Parler rapidement</h2>
-                                    <p class="p">Micro-leçons + exercices courts.</p>
-                                </div>
-                                <div class="chip" id="lessonsCount">4 leçons</div>
-                            </div>
-                            <div class="list" id="lessonsList"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- LESSON -->
-                <section class="view" id="view-lesson" aria-label="Leçon">
-                    <div class="topBar">
-                        <button class="backBtn" data-back="lessons">←</button>
-                        <p class="pageTitle" id="lessonTitle">Leçon</p>
-                        <button class="iconBtn" id="btn-speak" title="Écouter" aria-label="Écouter">🔊</button>
-                    </div>
-
-                    <div class="content">
-                        <div class="card" id="lessonCard">
-                            <p class="p" id="lessonTopic">Politesse</p>
-                            <div class="krBig" id="krBig">안녕하세요</div>
-                            <p class="roman" id="roman">annyeonghaseyo</p>
-                            <p class="meaning" id="meaning">bonjour</p>
-
-                            <div class="hintCard">
-                                <div class="p" style="margin-bottom:6px;">🧠 Compréhension simple</div>
-                                <div class="p" id="breakdown"><span class="k">안녕</span> = paix / bien-être • <span
-                                        class="k">하세요</span> = forme polie</div>
-                                <div class="p" style="margin-top:10px;">📍 Exemple réel</div>
-                                <div class="p" id="example"><span
-                                        style="font-family:var(--kfont); font-weight:760;">안녕하세요</span> 😊 → rencontre
-                                    formelle</div>
-                            </div>
-
-                            <button class="btnPrimary" id="btn-quiz">Faire le mini quiz</button>
-                        </div>
-
-                        <div class="card" id="quizCard" style="display:none; margin-top:12px;">
-                            <div class="audioRow">
-                                <button class="iconBtn" id="btn-quiz-speak" aria-label="Écouter la question">🔊</button>
-                                <div class="col" style="gap:3px;">
-                                    <div class="h2">Écoute et choisis</div>
-                                    <div class="p" id="quizPrompt" style="font-family:var(--kfont);">안녕하세요</div>
-                                </div>
-                            </div>
-
-                            <div class="choices" id="choices"></div>
-                            <div class="toast" id="toast"></div>
-
-                            <button class="btnGhost" id="btn-next-lesson" style="width:100%; margin-top:12px;">➡
-                                Suivant</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- IMMERSION -->
-                <section class="view" id="view-immersion" aria-label="Study café">
-                    <div class="topBar">
-                        <button class="backBtn" data-back="home">←</button>
-                        <p class="pageTitle">Study café à Séoul</p>
-                        <button class="iconBtn" id="btn-sound" title="Audio on/off"
-                            aria-label="Activer/Désactiver audio">🎧</button>
-                    </div>
-
-                    <div class="content">
-                        <div class="card">
-                            <div class="immersionTop">
-                                <div class="col" style="gap:4px;">
-                                    <div class="p">Session focus</div>
-                                    <div class="timer" id="timer">15:00</div>
-                                </div>
-                                <div class="row" style="gap:10px;">
-                                    <button class="btnGhost" id="btn-minus" aria-label="Réduire durée">−</button>
-                                    <button class="btnGhost" id="btn-plus" aria-label="Augmenter durée">+</button>
-                                </div>
-                            </div>
-
-                            <div style="display:flex; gap:10px; margin-top:12px;">
-                                <button class="btnPrimary" id="btn-start" style="flex:1;">▶ Démarrer</button>
-                                <button class="btnGhost" id="btn-stop" style="flex:1;">⏹ Stop</button>
-                            </div>
-
-                            <div class="toggles" aria-label="Ambiances">
-                                <div class="toggle" data-amb="cafe" data-on="true">
-                                    <div class="col" style="gap:2px;">
-                                        <div class="h2">☕ Café</div>
-                                        <div class="p">murmures + tasse</div>
-                                    </div>
-                                    <div class="switch" aria-hidden="true"></div>
-                                </div>
-                                <div class="toggle" data-amb="rain" data-on="true">
-                                    <div class="col" style="gap:2px;">
-                                        <div class="h2">🌧 Pluie</div>
-                                        <div class="p">bruit doux</div>
-                                    </div>
-                                    <div class="switch" aria-hidden="true"></div>
-                                </div>
-                                <div class="toggle" data-amb="metro" data-on="false">
-                                    <div class="col" style="gap:2px;">
-                                        <div class="h2">🚇 Métro</div>
-                                        <div class="p">ambiance lointaine</div>
-                                    </div>
-                                    <div class="switch" aria-hidden="true"></div>
-                                </div>
-                                <div class="toggle" data-amb="night" data-on="true">
-                                    <div class="col" style="gap:2px;">
-                                        <div class="h2">🌃 Seoul night</div>
-                                        <div class="p">hum urbain</div>
-                                    </div>
-                                    <div class="switch" aria-hidden="true"></div>
-                                </div>
-                            </div>
-
-                            <div class="ambientLine" id="ambientLine">
-                                Astuce : lance une session le soir, active “Pluie” + “Café”, et mets le mode nuit 🌙.
-                            </div>
-                        </div>
-
-                        <div class="card" style="margin-top:12px;">
-                            <div class="p">📖 Phrases qui défilent (immersion passive)</div>
-                            <div class="h2" id="floatPhrase" style="margin-top:6px; font-family:var(--kfont);">천천히 말해
-                                주세요</div>
-                            <div class="p" id="floatMeaning" style="margin-top:6px;">Parlez lentement s’il vous plaît
-                            </div>
-                            <button class="btnGhost" id="btn-phrase-next" style="width:100%; margin-top:12px;">Changer
-                                la phrase</button>
-                        </div>
-                    </div>
-                </section>
-
+        <!-- ONBOARDING -->
+        <section class="view" id="view-onboarding" aria-label="Onboarding">
+          <div class="onboard">
+            <div class="slides" role="region" aria-label="Slides">
+              <div class="slide active" data-slide="0">
+                <div class="k">서울 감성</div>
+                <h2>Apprends le coréen réel</h2>
+                <p class="p">Des phrases utiles, naturelles, comme dans la vraie vie.</p>
+              </div>
+              <div class="slide" data-slide="1">
+                <div class="k">5분이면 충분해요</div>
+                <h2>5 minutes par jour</h2>
+                <p class="p">Micro-leçons claires, sans surcharge.</p>
+              </div>
+              <div class="slide" data-slide="2">
+                <div class="k">여행 준비 끝</div>
+                <h2>Prépare ton voyage</h2>
+                <p class="p">Café, métro, politesse, mini dialogues : tu es prêt.</p>
+              </div>
             </div>
-        </div>
 
-        <nav class="nav" aria-label="Navigation">
-            <button data-nav="home" aria-current="page">
-                <span class="ico" aria-hidden="true"></span>
-                Home
-            </button>
-            <button data-nav="lessons">
-                <span class="ico" aria-hidden="true"></span>
-                Leçons
-            </button>
-            <button data-nav="immersion">
-                <span class="ico" aria-hidden="true"></span>
-                Café
-            </button>
-            <button data-nav="profile" disabled title="Bientôt">
-                <span class="ico" aria-hidden="true"></span>
-                Profil
-            </button>
-        </nav>
+            <div class="dots" aria-label="Pagination">
+              <span class="active" data-dot="0"></span>
+              <span data-dot="1"></span>
+              <span data-dot="2"></span>
+            </div>
+
+            <div class="row">
+              <button class="btnGhost" id="btn-skip">Passer</button>
+              <button class="btnPrimary" id="btn-next">Continuer</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- HOME -->
+        <section class="view" id="view-home" aria-label="Home">
+          <div class="hero">
+            <div class="heroContent">
+              <div class="brand">
+                <div class="title">Bonsoir 🌙</div>
+                <h1 class="headline">Prêt pour 5 minutes ?
+                  <span class="kr">오늘도 한국어 공부해요</span>
+                </h1>
+                <div class="pillRow">
+                  <div class="pill"><span class="dot"></span>Streak <b id="streak">1</b> jour</div>
+                  <div class="pill"><span class="dot purple"></span>Mot du jour <b id="wordOfDay">괜찮아요</b></div>
+                </div>
+              </div>
+              <button class="iconBtn" id="btn-theme" title="Mode nuit / jour" aria-label="Basculer thème">🌗</button>
+            </div>
+          </div>
+
+          <div class="content">
+            <div class="card">
+              <div class="row">
+                <div class="col">
+                  <p class="p" style="margin:0;">Niveau 3 — survivre à Séoul</p>
+                  <h2 class="h2" style="margin:0;">Progression</h2>
+                </div>
+                <div class="chip" id="levelChip">65%</div>
+              </div>
+
+              <div class="progressWrap" aria-label="Progression">
+                <div class="bar" aria-hidden="true"><span id="progressBar"></span></div>
+                <div class="pct" id="pct">65%</div>
+              </div>
+
+              <button class="btnPrimary" id="btn-continue">▶ Continuer la leçon</button>
+              <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btnGhost" id="btn-lessons" style="flex:1;">📚 Leçons</button>
+                <button class="btnGhost" id="btn-immersion" style="flex:1;">☕ Study café</button>
+              </div>
+            </div>
+
+            <div class="grid" aria-label="Modules">
+              <div class="tile" data-go="lessons">
+                <div class="badge">Essentiel</div>
+                <div>
+                  <div class="t">📘 Hangul</div>
+                  <div class="s">Apprendre à lire vite</div>
+                </div>
+              </div>
+              <div class="tile" data-go="lessons">
+                <div class="badge">Réel</div>
+                <div>
+                  <div class="t">🗣 Expressions</div>
+                  <div class="s">Parler naturellement</div>
+                </div>
+              </div>
+              <div class="tile" data-go="lessons">
+                <div class="badge">Séoul</div>
+                <div>
+                  <div class="t">☕ Café</div>
+                  <div class="s">Commander & social</div>
+                </div>
+              </div>
+              <div class="tile" data-go="immersion">
+                <div class="badge">Immersion</div>
+                <div>
+                  <div class="t">🌧 Study mode</div>
+                  <div class="s">Ambiance + focus</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hintCard" style="margin-top:14px;">
+              <div class="row">
+                <div class="col" style="gap:4px;">
+                  <div class="p">✨ Expression utile</div>
+                  <div class="h2" style="font-family:var(--kfont);">괜찮아요</div>
+                  <div class="p">C’est ok / pas de souci</div>
+                </div>
+                <button class="iconBtn" id="btn-speak-word" title="Écouter" aria-label="Écouter l'expression">🔊</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LESSONS LIST -->
+        <section class="view" id="view-lessons" aria-label="Leçons">
+          <div class="topBar">
+            <button class="backBtn" data-back="home">←</button>
+            <p class="pageTitle">Leçons essentielles</p>
+            <button class="iconBtn" id="btn-search" title="Bientôt" aria-label="Recherche (bientôt)">⌕</button>
+          </div>
+          <div class="content">
+            <div class="card">
+              <div class="row">
+                <div class="col" style="gap:4px;">
+                  <h2 class="h2">Parler rapidement</h2>
+                  <p class="p">Micro-leçons + exercices courts.</p>
+                </div>
+                <div class="chip" id="lessonsCount">4 leçons</div>
+              </div>
+              <div class="list" id="lessonsList"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LESSON -->
+        <section class="view" id="view-lesson" aria-label="Leçon">
+          <div class="topBar">
+            <button class="backBtn" data-back="lessons">←</button>
+            <p class="pageTitle" id="lessonTitle">Leçon</p>
+            <button class="iconBtn" id="btn-speak" title="Écouter" aria-label="Écouter">🔊</button>
+          </div>
+
+          <div class="content">
+            <div class="card" id="lessonCard">
+              <p class="p" id="lessonTopic">Politesse</p>
+              <div class="krBig" id="krBig">안녕하세요</div>
+              <p class="roman" id="roman">annyeonghaseyo</p>
+              <p class="meaning" id="meaning">bonjour</p>
+
+              <div class="hintCard">
+                <div class="p" style="margin-bottom:6px;">🧠 Compréhension simple</div>
+                <div class="p" id="breakdown"><span class="k">안녕</span> = paix / bien-être • <span class="k">하세요</span> = forme polie</div>
+                <div class="p" style="margin-top:10px;">📍 Exemple réel</div>
+                <div class="p" id="example"><span style="font-family:var(--kfont); font-weight:760;">안녕하세요</span> 😊 → rencontre formelle</div>
+              </div>
+
+              <button class="btnPrimary" id="btn-quiz">Faire le mini quiz</button>
+            </div>
+
+            <div class="card" id="quizCard" style="display:none; margin-top:12px;">
+              <div class="audioRow">
+                <button class="iconBtn" id="btn-quiz-speak" aria-label="Écouter la question">🔊</button>
+                <div class="col" style="gap:3px;">
+                  <div class="h2">Écoute et choisis</div>
+                  <div class="p" id="quizPrompt" style="font-family:var(--kfont);">안녕하세요</div>
+                </div>
+              </div>
+
+              <div class="choices" id="choices"></div>
+              <div class="toast" id="toast"></div>
+
+              <button class="btnGhost" id="btn-next-lesson" style="width:100%; margin-top:12px;">➡ Suivant</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- IMMERSION -->
+        <section class="view" id="view-immersion" aria-label="Study café">
+          <div class="topBar">
+            <button class="backBtn" data-back="home">←</button>
+            <p class="pageTitle">Study café à Séoul</p>
+            <button class="iconBtn" id="btn-sound" title="Audio on/off" aria-label="Activer/Désactiver audio">🎧</button>
+          </div>
+
+          <div class="content">
+            <div class="card">
+              <div class="immersionTop">
+                <div class="col" style="gap:4px;">
+                  <div class="p">Session focus</div>
+                  <div class="timer" id="timer">15:00</div>
+                </div>
+                <div class="row" style="gap:10px;">
+                  <button class="btnGhost" id="btn-minus" aria-label="Réduire durée">−</button>
+                  <button class="btnGhost" id="btn-plus" aria-label="Augmenter durée">+</button>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px; margin-top:12px;">
+                <button class="btnPrimary" id="btn-start" style="flex:1;">▶ Démarrer</button>
+                <button class="btnGhost" id="btn-stop" style="flex:1;">⏹ Stop</button>
+              </div>
+
+              <div class="toggles" aria-label="Ambiances">
+                <div class="toggle" data-amb="cafe" data-on="true">
+                  <div class="col" style="gap:2px;">
+                    <div class="h2">☕ Café</div>
+                    <div class="p">murmures + tasse</div>
+                  </div>
+                  <div class="switch" aria-hidden="true"></div>
+                </div>
+                <div class="toggle" data-amb="rain" data-on="true">
+                  <div class="col" style="gap:2px;">
+                    <div class="h2">🌧 Pluie</div>
+                    <div class="p">bruit doux</div>
+                  </div>
+                  <div class="switch" aria-hidden="true"></div>
+                </div>
+                <div class="toggle" data-amb="metro" data-on="false">
+                  <div class="col" style="gap:2px;">
+                    <div class="h2">🚇 Métro</div>
+                    <div class="p">ambiance lointaine</div>
+                  </div>
+                  <div class="switch" aria-hidden="true"></div>
+                </div>
+                <div class="toggle" data-amb="night" data-on="true">
+                  <div class="col" style="gap:2px;">
+                    <div class="h2">🌃 Seoul night</div>
+                    <div class="p">hum urbain</div>
+                  </div>
+                  <div class="switch" aria-hidden="true"></div>
+                </div>
+              </div>
+
+              <div class="ambientLine" id="ambientLine">
+                Astuce : lance une session le soir, active “Pluie” + “Café”, et mets le mode nuit 🌙.
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:12px;">
+              <div class="p">📖 Phrases qui défilent (immersion passive)</div>
+              <div class="h2" id="floatPhrase" style="margin-top:6px; font-family:var(--kfont);">천천히 말해 주세요</div>
+              <div class="p" id="floatMeaning" style="margin-top:6px;">Parlez lentement s’il vous plaît</div>
+              <button class="btnGhost" id="btn-phrase-next" style="width:100%; margin-top:12px;">Changer la phrase</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
     </div>
 
-    <script>
-        const state = {
-            theme: "day",
-            streak: 1,
-            progress: 65,
-            onboardIndex: 0,
-            currentLessonIndex: 0,
-            audioEnabled: true,
-            sessionSeconds: 15 * 60,
-            timerRunning: false,
-            timerEnd: 0,
-            amb: { cafe: true, rain: true, metro: false, night: true }
-        };
+    <nav class="nav" aria-label="Navigation">
+      <button data-nav="home" aria-current="page">
+        <span class="ico" aria-hidden="true"></span>
+        Home
+      </button>
+      <button data-nav="lessons">
+        <span class="ico" aria-hidden="true"></span>
+        Leçons
+      </button>
+      <button data-nav="immersion">
+        <span class="ico" aria-hidden="true"></span>
+        Café
+      </button>
+      <button data-nav="profile" disabled title="Bientôt">
+        <span class="ico" aria-hidden="true"></span>
+        Profil
+      </button>
+    </nav>
+  </div>
 
-        const views = {
-            splash: document.getElementById("view-splash"),
-            onboarding: document.getElementById("view-onboarding"),
-            home: document.getElementById("view-home"),
-            lessons: document.getElementById("view-lessons"),
-            lesson: document.getElementById("view-lesson"),
-            immersion: document.getElementById("view-immersion")
-        };
+  <script>
+    const state = {
+      theme: "day",
+      streak: 1,
+      progress: 65,
+      onboardIndex: 0,
+      currentLessonIndex: 0,
+      audioEnabled: true,
+      sessionSeconds: 15 * 60,
+      timerRunning: false,
+      timerEnd: 0,
+      amb: { cafe: true, rain: true, metro: false, night: true }
+    };
 
-        const screen = document.getElementById("screen");
+    const views = {
+      splash: document.getElementById("view-splash"),
+      onboarding: document.getElementById("view-onboarding"),
+      home: document.getElementById("view-home"),
+      lessons: document.getElementById("view-lessons"),
+      lesson: document.getElementById("view-lesson"),
+      immersion: document.getElementById("view-immersion")
+    };
 
-        function setView(name) {
-            Object.values(views).forEach(v => v.classList.remove("active"));
-            if (name === "profile") {
-                toastInline("Bientôt : profil & stats 🌙");
-                name = "home";
-            }
-            views[name].classList.add("active");
-            setNav(name);
-        }
+    const screen = document.getElementById("screen");
 
-        function setNav(name) {
-            document.querySelectorAll(".nav button[data-nav]").forEach(btn => {
-                const isActive = btn.dataset.nav === name;
-                btn.setAttribute("aria-current", isActive ? "page" : "false");
-            });
-        }
+    function toastInline(msg){
+      const line = document.getElementById("ambientLine");
+      if(line){
+        line.textContent = msg;
+        line.style.animation = "fadeUp .18s ease both";
+        setTimeout(() => line.style.animation = "", 250);
+      }
+    }
 
-        function toastInline(msg) {
-            const line = document.getElementById("ambientLine");
-            if (line) {
-                line.textContent = msg;
-                line.style.animation = "fadeUp .18s ease both";
-                setTimeout(() => line.style.animation = "", 250);
-            }
-        }
+    function setNav(name){
+      document.querySelectorAll(".nav button[data-nav]").forEach(btn => {
+        const isActive = btn.dataset.nav === name;
+        if (isActive) btn.setAttribute("aria-current", "page");
+        else btn.removeAttribute("aria-current");
+      });
+    }
 
-        const lessons = [
-            {
-                id: 1, name: "Bonjour & politesse", desc: "Saluer naturellement", topic: "Politesse",
-                kr: "안녕하세요", roman: "annyeonghaseyo", meaning: "bonjour",
-                breakdown: "<span class='k'>안녕</span> = paix / bien-être • <span class='k'>하세요</span> = forme polie",
-                example: "<span style='font-family:var(--kfont); font-weight:760;'>안녕하세요</span> 😊 → rencontre formelle",
-                quiz: { prompt: "안녕하세요", choices: ["Bonjour", "Merci", "Au revoir"], answer: 0 }
-            },
-            {
-                id: 2, name: "Merci / de rien", desc: "La base sociale", topic: "Politesse",
-                kr: "감사합니다", roman: "gamsahamnida", meaning: "merci (formel)",
-                breakdown: "<span class='k'>감사</span> = gratitude • <span class='k'>합니다</span> = forme formelle",
-                example: "<span style='font-family:var(--kfont); font-weight:760;'>감사합니다</span> 🙇 → très poli",
-                quiz: { prompt: "감사합니다", choices: ["Pardon", "Merci", "Je ne sais pas"], answer: 1 }
-            },
-            {
-                id: 3, name: "C’est ok / pas de souci", desc: "Réponse très fréquente", topic: "Expressions",
-                kr: "괜찮아요", roman: "gwaenchanayo", meaning: "c’est ok / pas de souci",
-                breakdown: "<span class='k'>괜찮</span> = aller bien • <span class='k'>아요</span> = politesse",
-                example: "<span style='font-family:var(--kfont); font-weight:760;'>괜찮아요</span> 🙂 → rassurer / refuser gentiment",
-                quiz: { prompt: "괜찮아요", choices: ["C’est ok", "Bonjour", "Pourquoi ?"], answer: 0 }
-            },
-            {
-                id: 4, name: "Parlez lentement SVP", desc: "Voyage & conversations", topic: "Voyage",
-                kr: "천천히 말해 주세요", roman: "cheoncheonhi malhae juseyo", meaning: "parlez lentement s’il vous plaît",
-                breakdown: "<span class='k'>천천히</span> = lentement • <span class='k'>말해</span> = parle • <span class='k'>주세요</span> = s’il vous plaît",
-                example: "<span style='font-family:var(--kfont); font-weight:760;'>천천히 말해 주세요</span> 🙏 → très utile en Corée",
-                quiz: { prompt: "천천히 말해 주세요", choices: ["Parlez plus fort", "Parlez lentement", "Merci"], answer: 1 }
-            }
-        ];
+    function resetOnboardingInlineStyles(){
+      document.querySelectorAll(".slide").forEach(s => {
+        s.style.transform = "";
+        s.style.opacity = "";
+        s.style.transition = "";
+      });
+    }
 
-        const lessonsList = document.getElementById("lessonsList");
-        const lessonsCount = document.getElementById("lessonsCount");
-        lessonsCount.textContent = `${lessons.length} leçons`;
+    function setView(name){
+      Object.values(views).forEach(v => v.classList.remove("active"));
 
-        function renderLessons() {
-            lessonsList.innerHTML = "";
-            lessons.forEach((l, idx) => {
-                const el = document.createElement("div");
-                el.className = "lesson";
-                el.innerHTML = `
+      if(name === "profile"){
+        toastInline("Bientôt : profil & stats 🌙");
+        name = "home";
+      }
+
+      // Si on quitte l'onboarding, on nettoie les styles inline du swipe
+      if (name !== "onboarding") resetOnboardingInlineStyles();
+
+      views[name].classList.add("active");
+      setNav(name);
+    }
+
+    const lessons = [
+      {
+        id: 1, name: "Bonjour & politesse", desc: "Saluer naturellement", topic: "Politesse",
+        kr: "안녕하세요", roman: "annyeonghaseyo", meaning: "bonjour",
+        breakdown: "<span class='k'>안녕</span> = paix / bien-être • <span class='k'>하세요</span> = forme polie",
+        example: "<span style='font-family:var(--kfont); font-weight:760;'>안녕하세요</span> 😊 → rencontre formelle",
+        quiz: { prompt: "안녕하세요", choices: ["Bonjour", "Merci", "Au revoir"], answer: 0 }
+      },
+      {
+        id: 2, name: "Merci / de rien", desc: "La base sociale", topic: "Politesse",
+        kr: "감사합니다", roman: "gamsahamnida", meaning: "merci (formel)",
+        breakdown: "<span class='k'>감사</span> = gratitude • <span class='k'>합니다</span> = forme formelle",
+        example: "<span style='font-family:var(--kfont); font-weight:760;'>감사합니다</span> 🙇 → très poli",
+        quiz: { prompt: "감사합니다", choices: ["Pardon", "Merci", "Je ne sais pas"], answer: 1 }
+      },
+      {
+        id: 3, name: "C’est ok / pas de souci", desc: "Réponse très fréquente", topic: "Expressions",
+        kr: "괜찮아요", roman: "gwaenchanayo", meaning: "c’est ok / pas de souci",
+        breakdown: "<span class='k'>괜찮</span> = aller bien • <span class='k'>아요</span> = politesse",
+        example: "<span style='font-family:var(--kfont); font-weight:760;'>괜찮아요</span> 🙂 → rassurer / refuser gentiment",
+        quiz: { prompt: "괜찮아요", choices: ["C’est ok", "Bonjour", "Pourquoi ?"], answer: 0 }
+      },
+      {
+        id: 4, name: "Parlez lentement SVP", desc: "Voyage & conversations", topic: "Voyage",
+        kr: "천천히 말해 주세요", roman: "cheoncheonhi malhae juseyo", meaning: "parlez lentement s’il vous plaît",
+        breakdown: "<span class='k'>천천히</span> = lentement • <span class='k'>말해</span> = parle • <span class='k'>주세요</span> = s’il vous plaît",
+        example: "<span style='font-family:var(--kfont); font-weight:760;'>천천히 말해 주세요</span> 🙏 → très utile en Corée",
+        quiz: { prompt: "천천히 말해 주세요", choices: ["Parlez plus fort", "Parlez lentement", "Merci"], answer: 1 }
+      }
+    ];
+
+    // Lessons list
+    const lessonsList = document.getElementById("lessonsList");
+    const lessonsCount = document.getElementById("lessonsCount");
+    lessonsCount.textContent = `${lessons.length} leçons`;
+
+    function renderLessons(){
+      lessonsList.innerHTML = "";
+      lessons.forEach((l, idx) => {
+        const el = document.createElement("div");
+        el.className = "lesson";
+        el.innerHTML = `
           <div class="num">${l.id}</div>
           <div class="meta">
             <div class="name">${l.name}</div>
@@ -1591,473 +1229,434 @@
           </div>
           <div class="chip">${l.topic}</div>
         `;
-                el.addEventListener("click", () => {
-                    state.currentLessonIndex = idx;
-                    openLesson(idx);
-                });
-                lessonsList.appendChild(el);
-            });
-        }
-        renderLessons();
-
-        const lessonTitle = document.getElementById("lessonTitle");
-        const lessonTopic = document.getElementById("lessonTopic");
-        const krBig = document.getElementById("krBig");
-        const roman = document.getElementById("roman");
-        const meaning = document.getElementById("meaning");
-        const breakdown = document.getElementById("breakdown");
-        const example = document.getElementById("example");
-        const btnSpeak = document.getElementById("btn-speak");
-        const btnQuiz = document.getElementById("btn-quiz");
-
-        const quizCard = document.getElementById("quizCard");
-        const lessonCard = document.getElementById("lessonCard");
-        const choicesEl = document.getElementById("choices");
-        const toast = document.getElementById("toast");
-        const quizPrompt = document.getElementById("quizPrompt");
-
-        function openLesson(idx) {
-            const l = lessons[idx];
-            lessonTitle.textContent = `Leçon ${l.id}`;
-            lessonTopic.textContent = l.topic;
-            krBig.textContent = l.kr;
-            roman.textContent = l.roman;
-            meaning.textContent = l.meaning;
-            breakdown.innerHTML = l.breakdown;
-            example.innerHTML = l.example;
-
-            toast.classList.remove("show");
-            quizCard.style.display = "none";
-            lessonCard.style.display = "block";
-            setView("lesson");
-        }
-
-        function showQuiz(idx) {
-            const l = lessons[idx];
-            quizPrompt.textContent = l.quiz.prompt;
-            choicesEl.innerHTML = "";
-            toast.classList.remove("show");
-
-            l.quiz.choices.forEach((c, i) => {
-                const b = document.createElement("button");
-                b.className = "choice";
-                b.textContent = `${String.fromCharCode(65 + i)}. ${c}`;
-                b.addEventListener("click", () => gradeChoice(i, l.quiz.answer));
-                choicesEl.appendChild(b);
-            });
-
-            lessonCard.style.display = "none";
-            quizCard.style.display = "block";
-        }
-
-        function gradeChoice(chosen, answer) {
-            const nodes = [...choicesEl.querySelectorAll(".choice")];
-            nodes.forEach((n, i) => {
-                n.disabled = true;
-                if (i === answer) n.classList.add("correct");
-                if (i === chosen && chosen !== answer) n.classList.add("wrong");
-            });
-
-            if (chosen === answer) {
-                toast.textContent = "✅ Bien joué !";
-                state.progress = Math.min(100, state.progress + 3);
-                updateProgressUI();
-            } else {
-                toast.textContent = "❌ Presque. Réessaie demain — tu vas l’avoir.";
-            }
-            toast.classList.add("show");
-        }
-
-        document.getElementById("btn-next-lesson").addEventListener("click", () => {
-            const next = (state.currentLessonIndex + 1) % lessons.length;
-            state.currentLessonIndex = next;
-            openLesson(next);
+        el.addEventListener("click", () => {
+          state.currentLessonIndex = idx;
+          openLesson(idx);
         });
+        lessonsList.appendChild(el);
+      });
+    }
+    renderLessons();
 
-        const progressBar = document.getElementById("progressBar");
-        const pct = document.getElementById("pct");
-        const levelChip = document.getElementById("levelChip");
-        const streakEl = document.getElementById("streak");
-        const wordOfDayEl = document.getElementById("wordOfDay");
+    // Lesson elements
+    const lessonTitle = document.getElementById("lessonTitle");
+    const lessonTopic = document.getElementById("lessonTopic");
+    const krBig = document.getElementById("krBig");
+    const roman = document.getElementById("roman");
+    const meaning = document.getElementById("meaning");
+    const breakdown = document.getElementById("breakdown");
+    const example = document.getElementById("example");
+    const btnSpeak = document.getElementById("btn-speak");
+    const btnQuiz = document.getElementById("btn-quiz");
 
-        function updateProgressUI() {
-            progressBar.style.width = `${state.progress}%`;
-            pct.textContent = `${state.progress}%`;
-            levelChip.textContent = `${state.progress}%`;
-            streakEl.textContent = state.streak;
-        }
+    const quizCard = document.getElementById("quizCard");
+    const lessonCard = document.getElementById("lessonCard");
+    const choicesEl = document.getElementById("choices");
+    const toast = document.getElementById("toast");
+    const quizPrompt = document.getElementById("quizPrompt");
+
+    function openLesson(idx){
+      const l = lessons[idx];
+      lessonTitle.textContent = `Leçon ${l.id}`;
+      lessonTopic.textContent = l.topic;
+      krBig.textContent = l.kr;
+      roman.textContent = l.roman;
+      meaning.textContent = l.meaning;
+      breakdown.innerHTML = l.breakdown;
+      example.innerHTML = l.example;
+
+      toast.classList.remove("show");
+      quizCard.style.display = "none";
+      lessonCard.style.display = "block";
+      setView("lesson");
+    }
+
+    function showQuiz(idx){
+      const l = lessons[idx];
+      quizPrompt.textContent = l.quiz.prompt;
+      choicesEl.innerHTML = "";
+      toast.classList.remove("show");
+
+      l.quiz.choices.forEach((c, i) => {
+        const b = document.createElement("button");
+        b.className = "choice";
+        b.textContent = `${String.fromCharCode(65 + i)}. ${c}`;
+        b.addEventListener("click", () => gradeChoice(i, l.quiz.answer));
+        choicesEl.appendChild(b);
+      });
+
+      lessonCard.style.display = "none";
+      quizCard.style.display = "block";
+    }
+
+    function gradeChoice(chosen, answer){
+      const nodes = [...choicesEl.querySelectorAll(".choice")];
+      nodes.forEach((n, i) => {
+        n.disabled = true;
+        if(i === answer) n.classList.add("correct");
+        if(i === chosen && chosen !== answer) n.classList.add("wrong");
+      });
+
+      if(chosen === answer){
+        toast.textContent = "✅ Bien joué !";
+        state.progress = Math.min(100, state.progress + 3);
         updateProgressUI();
+      } else {
+        toast.textContent = "❌ Presque. Réessaie demain — tu vas l’avoir.";
+      }
+      toast.classList.add("show");
+    }
 
-        const wotd = ["괜찮아요", "안녕하세요", "감사합니다", "주세요", "맞아요", "아니에요"];
-        wordOfDayEl.textContent = wotd[Math.floor(Date.now() / 86400000) % wotd.length];
+    document.getElementById("btn-next-lesson").addEventListener("click", () => {
+      const next = (state.currentLessonIndex + 1) % lessons.length;
+      state.currentLessonIndex = next;
+      openLesson(next);
+    });
 
-        document.querySelectorAll(".nav button[data-nav]").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const name = btn.dataset.nav;
-                setView(name);
-            });
+    // Progress UI
+    const progressBar = document.getElementById("progressBar");
+    const pct = document.getElementById("pct");
+    const levelChip = document.getElementById("levelChip");
+    const streakEl = document.getElementById("streak");
+    const wordOfDayEl = document.getElementById("wordOfDay");
+
+    function updateProgressUI(){
+      progressBar.style.width = `${state.progress}%`;
+      pct.textContent = `${state.progress}%`;
+      levelChip.textContent = `${state.progress}%`;
+      streakEl.textContent = state.streak;
+    }
+    updateProgressUI();
+
+    // Word of day
+    const wotd = ["괜찮아요", "안녕하세요", "감사합니다", "주세요", "맞아요", "아니에요"];
+    wordOfDayEl.textContent = wotd[Math.floor(Date.now() / 86400000) % wotd.length];
+
+    // Navigation
+    document.querySelectorAll(".nav button[data-nav]").forEach(btn => {
+      btn.addEventListener("click", () => setView(btn.dataset.nav));
+    });
+    document.querySelectorAll("[data-back]").forEach(btn => {
+      btn.addEventListener("click", () => setView(btn.dataset.back));
+    });
+
+    document.getElementById("btn-lessons").addEventListener("click", () => setView("lessons"));
+    document.getElementById("btn-immersion").addEventListener("click", () => setView("immersion"));
+    document.getElementById("btn-continue").addEventListener("click", () => openLesson(state.currentLessonIndex));
+    document.querySelectorAll(".tile").forEach(t => {
+      t.addEventListener("click", () => {
+        const go = t.dataset.go;
+        if(go === "lessons") setView("lessons");
+        if(go === "immersion") setView("immersion");
+      });
+    });
+
+    // Theme
+    document.getElementById("btn-theme").addEventListener("click", () => {
+      state.theme = (state.theme === "day") ? "night" : "day";
+      screen.setAttribute("data-theme", state.theme);
+    });
+
+    // Speech
+    btnSpeak.addEventListener("click", () => {
+      const l = lessons[state.currentLessonIndex];
+      try{
+        const u = new SpeechSynthesisUtterance(l.kr);
+        u.lang = "ko-KR";
+        u.rate = 0.92;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      } catch {}
+    });
+    document.getElementById("btn-speak-word").addEventListener("click", () => {
+      try{
+        const u = new SpeechSynthesisUtterance(wordOfDayEl.textContent);
+        u.lang = "ko-KR";
+        u.rate = 0.92;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      } catch {}
+    });
+
+    btnQuiz.addEventListener("click", () => showQuiz(state.currentLessonIndex));
+
+    // -------------------------
+    // ONBOARDING (setOnboard) — corrigé
+    // -------------------------
+    const slideElsMain = [...document.querySelectorAll(".slide")];
+    const dotElsMain = [...document.querySelectorAll(".dots span")];
+
+    function setOnboard(i){
+      state.onboardIndex = i;
+      slideElsMain.forEach(s => s.classList.toggle("active", Number(s.dataset.slide) === i));
+      dotElsMain.forEach(d => d.classList.toggle("active", Number(d.dataset.dot) === i));
+      document.getElementById("btn-next").textContent = (i === 2) ? "Commencer" : "Continuer";
+    }
+    window.setOnboard = setOnboard; // ✅ exposé UNE fois (corrigé)
+
+    document.getElementById("btn-next").addEventListener("click", () => {
+      if(state.onboardIndex < 2) setOnboard(state.onboardIndex + 1);
+      else setView("home");
+    });
+    document.getElementById("btn-skip").addEventListener("click", () => setView("home"));
+
+    // -------------------------
+    // SWIPE/DRAG slider (corrigé + robuste)
+    // -------------------------
+    (() => {
+      const slidesBox = document.querySelector(".slides");
+      const slideEls = [...document.querySelectorAll(".slide")];
+      const dots = [...document.querySelectorAll(".dots span")];
+      if(!slidesBox || slideEls.length === 0) return;
+
+      let startX = 0, startY = 0, dx = 0;
+      let dragging = false;
+      let activeId = null;
+      let lockAxis = null; // "x" | "y" | null
+
+      const setIndex = (i) => window.setOnboard ? window.setOnboard(i) : null;
+
+      const getIndex = () => {
+        const active = slideEls.find(s => s.classList.contains("active"));
+        return active ? Number(active.dataset.slide) : 0;
+      };
+
+      function setDragStyles(on){
+        slideEls.forEach(s => { s.style.transition = on ? "none" : ""; });
+      }
+
+      function renderDrag(offsetPx){
+        const i = getIndex();
+        slideEls.forEach((s) => {
+          const idx = Number(s.dataset.slide);
+
+          if(idx === i){
+            s.style.transform = `translateX(${offsetPx}px)`;
+            s.style.opacity = `${1 - Math.min(0.45, Math.abs(offsetPx) / 480)}`;
+          } else if(idx === i + 1){
+            s.style.transform = `translateX(${offsetPx + slidesBox.clientWidth}px)`;
+            s.style.opacity = `${Math.min(1, Math.max(0, Math.abs(offsetPx) / 480))}`;
+          } else if(idx === i - 1){
+            s.style.transform = `translateX(${offsetPx - slidesBox.clientWidth}px)`;
+            s.style.opacity = `${Math.min(1, Math.max(0, Math.abs(offsetPx) / 480))}`;
+          } else {
+            s.style.transform = "translateX(9999px)";
+            s.style.opacity = "0";
+          }
         });
-        document.querySelectorAll("[data-back]").forEach(btn => {
-            btn.addEventListener("click", () => setView(btn.dataset.back));
-        });
+      }
 
-        document.getElementById("btn-lessons").addEventListener("click", () => setView("lessons"));
-        document.getElementById("btn-immersion").addEventListener("click", () => setView("immersion"));
-        document.getElementById("btn-continue").addEventListener("click", () => openLesson(state.currentLessonIndex));
-        document.querySelectorAll(".tile").forEach(t => {
-            t.addEventListener("click", () => {
-                const go = t.dataset.go;
-                if (go === "lessons") setView("lessons");
-                if (go === "immersion") setView("immersion");
-            });
-        });
-
-        const slides = [...document.querySelectorAll(".slide")];
-        const dots = [...document.querySelectorAll(".dots span")];
-        function setOnboard(i) {
-            window.setOnboard = setOnboard; // expose pour le slider
-            state.onboardIndex = i;
-            slides.forEach(s => s.classList.toggle("active", Number(s.dataset.slide) === i));
-            dots.forEach(d => d.classList.toggle("active", Number(d.dataset.dot) === i));
-            document.getElementById("btn-next").textContent = (i === 2) ? "Commencer" : "Continuer";
+      function resetDrag(){
+        slideEls.forEach(s => { s.style.transform = ""; s.style.opacity = ""; });
+        setDragStyles(false);
+        dx = 0;
+        dragging = false;
+        lockAxis = null;
+        if(activeId !== null && slidesBox.releasePointerCapture){
+          try{ slidesBox.releasePointerCapture(activeId); } catch {}
         }
-        document.getElementById("btn-next").addEventListener("click", () => {
-            if (state.onboardIndex < 2) setOnboard(state.onboardIndex + 1);
-            else setView("home");
-        });
-        document.getElementById("btn-skip").addEventListener("click", () => setView("home"));
+        activeId = null;
+      }
 
-        document.getElementById("btn-theme").addEventListener("click", () => {
-            state.theme = (state.theme === "day") ? "night" : "day";
-            screen.setAttribute("data-theme", state.theme);
-        });
+      function onDown(clientX, clientY, pointerId){
+        startX = clientX;
+        startY = clientY;
+        dx = 0;
+        dragging = true;
+        lockAxis = null;
+        activeId = pointerId ?? null;
+        setDragStyles(true);
+      }
 
-        // =========================
-        // Onboarding: SWIPE/DRAG slider (mobile + desktop)
-        // =========================
-        (() => {
-            const slidesBox = document.querySelector(".slides");
-            const slideEls = [...document.querySelectorAll(".slide")];
-            const dots = [...document.querySelectorAll(".dots span")];
-            if (!slidesBox || slideEls.length === 0) return;
+      function onMove(clientX, clientY){
+        if(!dragging) return;
 
-            let startX = 0;
-            let startY = 0;
-            let dx = 0;
-            let dragging = false;
-            let activeId = null;
-            let lockAxis = null; // "x" | "y" | null
+        const diffX = clientX - startX;
+        const diffY = clientY - startY;
 
-            // Utilise ta fonction existante si elle existe
-            const setIndex = (i) => {
-                if (typeof window.setOnboard === "function") {
-                    window.setOnboard(i);
-                    return;
-                }
-                // fallback (au cas où setOnboard n'est pas global)
-                slideEls.forEach(s => s.classList.toggle("active", Number(s.dataset.slide) === i));
-                dots.forEach(d => d.classList.toggle("active", Number(d.dataset.dot) === i));
-            };
-
-            const getIndex = () => {
-                // détecte le slide actif
-                const active = slideEls.find(s => s.classList.contains("active"));
-                return active ? Number(active.dataset.slide) : 0;
-            };
-
-            function setDragStyles(on) {
-                slideEls.forEach((s) => {
-                    if (on) {
-                        s.style.transition = "none";
-                    } else {
-                        s.style.transition = ""; // revient au CSS
-                    }
-                });
-            }
-
-            function renderDrag(offsetPx) {
-                const i = getIndex();
-                // On translate le slide actif + le suivant/précédent pour donner l'impression de swipe
-                slideEls.forEach((s) => {
-                    const idx = Number(s.dataset.slide);
-                    if (idx === i) {
-                        s.style.transform = `translateX(${offsetPx}px)`;
-                        s.style.opacity = `${1 - Math.min(0.45, Math.abs(offsetPx) / 480)}`;
-                    } else if (idx === i + 1) {
-                        s.style.transform = `translateX(${offsetPx + slidesBox.clientWidth}px)`;
-                        s.style.opacity = `${Math.min(1, Math.max(0, Math.abs(offsetPx) / 480))}`;
-                    } else if (idx === i - 1) {
-                        s.style.transform = `translateX(${offsetPx - slidesBox.clientWidth}px)`;
-                        s.style.opacity = `${Math.min(1, Math.max(0, Math.abs(offsetPx) / 480))}`;
-                    } else {
-                        // cache complètement les autres slides
-                        s.style.transform = "translateX(9999px)";
-                        s.style.opacity = "0";
-                    }
-                });
-            }
-
-            function resetDrag() {
-                slideEls.forEach((s) => { s.style.transform = ""; s.style.opacity = ""; });
-                setDragStyles(false);
-                dx = 0;
-                dragging = false;
-                lockAxis = null;
-                if (activeId !== null && slidesBox.releasePointerCapture) {
-                    try { slidesBox.releasePointerCapture(activeId); } catch { }
-                }
-                activeId = null;
-            }
-
-            function onDown(clientX, clientY, pointerId) {
-                startX = clientX;
-                startY = clientY;
-                dx = 0;
-                dragging = true;
-                lockAxis = null;
-                activeId = pointerId ?? null;
-                setDragStyles(true);
-            }
-
-            function onMove(clientX, clientY) {
-                if (!dragging) return;
-
-                const diffX = clientX - startX;
-                const diffY = clientY - startY;
-
-                // lock axis après un petit seuil
-                if (!lockAxis) {
-                    if (Math.abs(diffX) > 8 || Math.abs(diffY) > 8) {
-                        lockAxis = Math.abs(diffX) > Math.abs(diffY) ? "x" : "y";
-                    } else {
-                        return;
-                    }
-                }
-
-                if (lockAxis === "y") {
-                    // laisse le scroll vertical normal
-                    resetDrag();
-                    return;
-                }
-
-                // lock horizontal => on empêche le scroll de la page pendant le swipe
-                dx = diffX;
-                // résistance aux bords (effet premium)
-                const i = getIndex();
-                const atStart = i === 0;
-                const atEnd = i === slideEls.length - 1;
-                if ((atStart && dx > 0) || (atEnd && dx < 0)) dx *= 0.35;
-
-                renderDrag(dx);
-            }
-
-            function onUp() {
-                if (!dragging) return;
-
-                const i = getIndex();
-                const threshold = Math.min(120, slidesBox.clientWidth * 0.22);
-
-                if (Math.abs(dx) > threshold) {
-                    const dir = dx < 0 ? 1 : -1; // swipe gauche => next
-                    const next = Math.max(0, Math.min(slideEls.length - 1, i + dir));
-                    setIndex(next);
-                } else {
-                    // snap back
-                    setIndex(i);
-                }
-                resetDrag();
-            }
-
-            // Pointer events (desktop + mobile moderne)
-            slidesBox.addEventListener("pointerdown", (e) => {
-                // seulement pour le doigt/souris
-                if (e.pointerType === "mouse" && e.button !== 0) return;
-                onDown(e.clientX, e.clientY, e.pointerId);
-                if (slidesBox.setPointerCapture) {
-                    try { slidesBox.setPointerCapture(e.pointerId); } catch { }
-                }
-            });
-
-            slidesBox.addEventListener("pointermove", (e) => {
-                if (!dragging) return;
-                // empêche le scroll quand on est en lockAxis x
-                if (lockAxis === "x") e.preventDefault();
-                onMove(e.clientX, e.clientY);
-            }, { passive: false });
-
-            slidesBox.addEventListener("pointerup", onUp);
-            slidesBox.addEventListener("pointercancel", resetDrag);
-        })();
-
-
-        btnSpeak.addEventListener("click", () => {
-            const l = lessons[state.currentLessonIndex];
-            try {
-                const u = new SpeechSynthesisUtterance(l.kr);
-                u.lang = "ko-KR";
-                u.rate = 0.92;
-                speechSynthesis.cancel();
-                speechSynthesis.speak(u);
-            } catch { }
-        });
-
-        document.getElementById("btn-speak-word").addEventListener("click", () => {
-            try {
-                const u = new SpeechSynthesisUtterance(wordOfDayEl.textContent);
-                u.lang = "ko-KR";
-                u.rate = 0.92;
-                speechSynthesis.cancel();
-                speechSynthesis.speak(u);
-            } catch { }
-        });
-
-        btnQuiz.addEventListener("click", () => showQuiz(state.currentLessonIndex));
-
-        // Splash -> Onboarding
-        setTimeout(() => {
-            const splash = document.querySelector("#view-splash");
-
-            splash.classList.add("splash-exit");
-
-            setTimeout(() => {
-                setView("onboarding");
-            }, 800); // durée animation
-        }, 3000);
-
-
-        // Immersion phrases
-        const floatPhrase = document.getElementById("floatPhrase");
-        const floatMeaning = document.getElementById("floatMeaning");
-        const immersionPhrases = [
-            { kr: "천천히 말해 주세요", fr: "Parlez lentement s’il vous plaît" },
-            { kr: "이거 얼마예요?", fr: "C’est combien ?" },
-            { kr: "아메리카노 한 잔 주세요", fr: "Un americano, s’il vous plaît" },
-            { kr: "괜찮아요", fr: "C’est ok / pas de souci" },
-            { kr: "화장실 어디예요?", fr: "Où sont les toilettes ?" },
-            { kr: "저기요", fr: "Excusez-moi (pour appeler)" }
-        ];
-        function nextPhrase() {
-            const item = immersionPhrases[Math.floor(Math.random() * immersionPhrases.length)];
-            floatPhrase.textContent = item.kr;
-            floatMeaning.textContent = item.fr;
+        if(!lockAxis){
+          if(Math.abs(diffX) > 8 || Math.abs(diffY) > 8){
+            lockAxis = Math.abs(diffX) > Math.abs(diffY) ? "x" : "y";
+          } else return;
         }
-        document.getElementById("btn-phrase-next").addEventListener("click", nextPhrase);
 
-        // Timer minimal
-        const timerEl = document.getElementById("timer");
-        function formatMMSS(s) {
-            const mm = Math.floor(s / 60);
-            const ss = s % 60;
-            return `${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+        if(lockAxis === "y"){
+          resetDrag();
+          return;
         }
-        function renderTimer() { timerEl.textContent = formatMMSS(state.sessionSeconds); }
-        renderTimer();
 
-        document.getElementById("btn-minus").addEventListener("click", () => {
-            if (state.timerRunning) return;
-            state.sessionSeconds = Math.max(5 * 60, state.sessionSeconds - 5 * 60);
-            renderTimer();
-        });
-        document.getElementById("btn-plus").addEventListener("click", () => {
-            if (state.timerRunning) return;
-            state.sessionSeconds = Math.min(60 * 60, state.sessionSeconds + 5 * 60);
-            renderTimer();
-        });
+        dx = diffX;
 
-        let tickHandle = null;
-        document.getElementById("btn-start").addEventListener("click", () => {
-            state.timerRunning = true;
-            state.timerEnd = Date.now() + state.sessionSeconds * 1000;
-            if (tickHandle) clearInterval(tickHandle);
-            tickHandle = setInterval(() => {
-                const left = Math.max(0, Math.ceil((state.timerEnd - Date.now()) / 1000));
-                timerEl.textContent = formatMMSS(left);
-                if (left === 0) {
-                    clearInterval(tickHandle);
-                    state.timerRunning = false;
-                    toastInline("Session terminée ✅ Respire…");
-                    state.streak = Math.min(99, state.streak + 1);
-                    updateProgressUI();
-                }
-            }, 250);
-            toastInline("Session lancée ☕🌧");
-        });
+        const i = getIndex();
+        const atStart = i === 0;
+        const atEnd = i === slideEls.length - 1;
+        if((atStart && dx > 0) || (atEnd && dx < 0)) dx *= 0.35;
 
-        document.getElementById("btn-stop").addEventListener("click", () => {
-            if (tickHandle) clearInterval(tickHandle);
-            state.timerRunning = false;
-            renderTimer();
-            toastInline("Session stoppée.");
-        });
+        renderDrag(dx);
+      }
 
-        document.getElementById("btn-search").addEventListener("click", () => {
-            toastInline("Recherche bientôt 🔍 (prototype)");
-        });
+      function onUp(){
+        if(!dragging) return;
 
-        // =========================
-        // PARALLAX ENGINE (Premium)
-        // =========================
-        (() => {
-            const screenEl = document.getElementById("screen");
-            if (!screenEl) return;
+        const i = getIndex();
+        const threshold = Math.min(120, slidesBox.clientWidth * 0.22);
 
-            let targetX = 0, targetY = 0;
-            let curX = 0, curY = 0;
-            let raf = 0;
+        if(Math.abs(dx) > threshold){
+          const dir = dx < 0 ? 1 : -1;
+          const next = Math.max(0, Math.min(slideEls.length - 1, i + dir));
+          setIndex(next);
+        } else {
+          setIndex(i);
+        }
 
-            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+        resetDrag();
+      }
 
-            function setVars(x, y) {
-                screenEl.style.setProperty("--px", `${x}px`);
-                screenEl.style.setProperty("--py", `${y}px`);
-            }
+      slidesBox.addEventListener("pointerdown", (e) => {
+        if(e.pointerType === "mouse" && e.button !== 0) return;
+        onDown(e.clientX, e.clientY, e.pointerId);
+        if(slidesBox.setPointerCapture){
+          try{ slidesBox.setPointerCapture(e.pointerId); } catch {}
+        }
+      });
 
-            function tick() {
-                // smoothing (inertie premium)
-                curX += (targetX - curX) * 0.08;
-                curY += (targetY - curY) * 0.08;
+      slidesBox.addEventListener("pointermove", (e) => {
+        if(!dragging) return;
+        if(lockAxis === "x") e.preventDefault();
+        onMove(e.clientX, e.clientY);
+      }, { passive:false });
 
-                setVars(curX, curY);
+      slidesBox.addEventListener("pointerup", onUp);
+      slidesBox.addEventListener("pointercancel", resetDrag);
+    })();
 
-                raf = requestAnimationFrame(tick);
-            }
+    // Splash -> Onboarding (3s)
+    setTimeout(() => {
+      const splash = document.querySelector("#view-splash");
+      splash.classList.add("splash-exit");
+      setTimeout(() => setView("onboarding"), 800);
+    }, 3000);
 
-            function onMove(clientX, clientY) {
-                const r = screenEl.getBoundingClientRect();
-                const nx = (clientX - (r.left + r.width / 2)) / (r.width / 2);
-                const ny = (clientY - (r.top + r.height / 2)) / (r.height / 2);
+    // Immersion phrases
+    const floatPhrase = document.getElementById("floatPhrase");
+    const floatMeaning = document.getElementById("floatMeaning");
+    const immersionPhrases = [
+      { kr: "천천히 말해 주세요", fr: "Parlez lentement s’il vous plaît" },
+      { kr: "이거 얼마예요?", fr: "C’est combien ?" },
+      { kr: "아메리카노 한 잔 주세요", fr: "Un americano, s’il vous plaît" },
+      { kr: "괜찮아요", fr: "C’est ok / pas de souci" },
+      { kr: "화장실 어디예요?", fr: "Où sont les toilettes ?" },
+      { kr: "저기요", fr: "Excusez-moi (pour appeler)" }
+    ];
+    function nextPhrase(){
+      const item = immersionPhrases[Math.floor(Math.random() * immersionPhrases.length)];
+      floatPhrase.textContent = item.kr;
+      floatMeaning.textContent = item.fr;
+    }
+    document.getElementById("btn-phrase-next").addEventListener("click", nextPhrase);
 
-                // amplitude (px)
-                targetX = clamp(nx * 18, -18, 18);
-                targetY = clamp(ny * 18, -18, 18);
+    // Timer minimal
+    const timerEl = document.getElementById("timer");
+    function formatMMSS(s){
+      const mm = Math.floor(s / 60);
+      const ss = s % 60;
+      return `${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+    }
+    function renderTimer(){ timerEl.textContent = formatMMSS(state.sessionSeconds); }
+    renderTimer();
 
-                if (!raf) raf = requestAnimationFrame(tick);
-            }
+    document.getElementById("btn-minus").addEventListener("click", () => {
+      if(state.timerRunning) return;
+      state.sessionSeconds = Math.max(5 * 60, state.sessionSeconds - 5 * 60);
+      renderTimer();
+    });
+    document.getElementById("btn-plus").addEventListener("click", () => {
+      if(state.timerRunning) return;
+      state.sessionSeconds = Math.min(60 * 60, state.sessionSeconds + 5 * 60);
+      renderTimer();
+    });
 
-            // Desktop: souris
-            window.addEventListener("mousemove", (e) => onMove(e.clientX, e.clientY), { passive: true });
+    let tickHandle = null;
+    document.getElementById("btn-start").addEventListener("click", () => {
+      state.timerRunning = true;
+      state.timerEnd = Date.now() + state.sessionSeconds * 1000;
+      if(tickHandle) clearInterval(tickHandle);
 
-            // Mobile: orientation (si dispo)
-            window.addEventListener("deviceorientation", (e) => {
-                if (typeof e.gamma !== "number" || typeof e.beta !== "number") return;
-                // gamma: gauche/droite, beta: avant/arrière
-                const nx = clamp(e.gamma / 25, -1, 1);
-                const ny = clamp(e.beta / 35, -1, 1);
-                targetX = nx * 12;
-                targetY = ny * 12;
-                if (!raf) raf = requestAnimationFrame(tick);
-            }, { passive: true });
+      tickHandle = setInterval(() => {
+        const left = Math.max(0, Math.ceil((state.timerEnd - Date.now()) / 1000));
+        timerEl.textContent = formatMMSS(left);
+        if(left === 0){
+          clearInterval(tickHandle);
+          state.timerRunning = false;
+          toastInline("Session terminée ✅ Respire…");
+          state.streak = Math.min(99, state.streak + 1);
+          updateProgressUI();
+        }
+      }, 250);
 
-            // Reset doux quand la souris sort
-            window.addEventListener("mouseleave", () => {
-                targetX = 0; targetY = 0;
-            });
+      toastInline("Session lancée ☕🌧");
+    });
 
-            // Si tu veux couper l'effet quand on scroll beaucoup (optionnel)
-            // window.addEventListener("scroll", () => { targetX = 0; targetY = 0; }, { passive:true });
-        })();
+    document.getElementById("btn-stop").addEventListener("click", () => {
+      if(tickHandle) clearInterval(tickHandle);
+      state.timerRunning = false;
+      renderTimer();
+      toastInline("Session stoppée.");
+    });
 
-    </script>
+    document.getElementById("btn-search").addEventListener("click", () => {
+      toastInline("Recherche bientôt 🔍 (prototype)");
+    });
+
+    // =========================
+    // PARALLAX ENGINE (Premium)
+    // =========================
+    (() => {
+      const screenEl = document.getElementById("screen");
+      if(!screenEl) return;
+
+      let targetX = 0, targetY = 0;
+      let curX = 0, curY = 0;
+      let raf = 0;
+
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+      function setVars(x, y){
+        screenEl.style.setProperty("--px", `${x}px`);
+        screenEl.style.setProperty("--py", `${y}px`);
+      }
+
+      function tick(){
+        curX += (targetX - curX) * 0.08;
+        curY += (targetY - curY) * 0.08;
+        setVars(curX, curY);
+        raf = requestAnimationFrame(tick);
+      }
+
+      function onMove(clientX, clientY){
+        const r = screenEl.getBoundingClientRect();
+        const nx = (clientX - (r.left + r.width/2)) / (r.width/2);
+        const ny = (clientY - (r.top + r.height/2)) / (r.height/2);
+
+        targetX = clamp(nx * 18, -18, 18);
+        targetY = clamp(ny * 18, -18, 18);
+
+        if(!raf) raf = requestAnimationFrame(tick);
+      }
+
+      window.addEventListener("mousemove", (e) => onMove(e.clientX, e.clientY), { passive:true });
+
+      window.addEventListener("deviceorientation", (e) => {
+        if(typeof e.gamma !== "number" || typeof e.beta !== "number") return;
+        const nx = clamp(e.gamma / 25, -1, 1);
+        const ny = clamp(e.beta / 35, -1, 1);
+        targetX = nx * 12;
+        targetY = ny * 12;
+        if(!raf) raf = requestAnimationFrame(tick);
+      }, { passive:true });
+
+      window.addEventListener("mouseleave", () => { targetX = 0; targetY = 0; });
+    })();
+  </script>
 </body>
-
 </html>
