@@ -671,11 +671,12 @@
             border: 1px solid color-mix(in oklab, var(--muted) 65%, transparent);
             box-shadow: var(--shadow2);
             position: relative;
-            background: #000;
             touch-action: pan-y;
             /* swipe horizontal géré en JS */
             user-select: none;
-            -webkit-user-select: none;
+         
+            /* ou var(--panel) si tu veux */
+            background: color-mix(in oklab, var(--panel) 92%, transparent) !important;
         }
 
         /* Désactivé: plus de background global (chaque slide a son image) */
@@ -1162,6 +1163,20 @@
 
         .slidesTrack.is-dragging {
             transition: none !important;
+        }
+
+        /* Empêche tout overlay fixe derrière le track */
+        .slides::before,
+        .slides::after {
+            content: none !important;
+        }
+
+        .slidesTrack {
+            height: 100%;
+        }
+
+        .slide {
+            height: 100%;
         }
     </style>
 </head>
