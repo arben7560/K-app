@@ -572,6 +572,29 @@
             /* ✅ IMPORTANT */
         }
 
+        /* SPLASH EXIT ANIMATION */
+        .splash-exit {
+            animation: splashFade 0.9s ease forwards;
+        }
+
+        @keyframes splashFade {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            60% {
+                opacity: 0.6;
+                transform: scale(1.03);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1.08);
+            }
+        }
+
+
 
         [data-theme="night"] .splash::after {
             background:
@@ -1684,10 +1707,15 @@
 
         // Splash -> Onboarding
         setTimeout(() => {
-            setView("onboarding");
-            setOnboard(0);
-            requestAnimationFrame(() => updateProgressUI());
+            const splash = document.querySelector("#view-splash");
+
+            splash.classList.add("splash-exit");
+
+            setTimeout(() => {
+                setView("onboarding");
+            }, 800); // durée animation
         }, 3000);
+
 
         // Immersion phrases
         const floatPhrase = document.getElementById("floatPhrase");
