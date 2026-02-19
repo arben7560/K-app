@@ -704,9 +704,8 @@
             content: "";
             position: absolute;
             inset: 0;
-            background-image: var(--img-skyline);
-            background-size: cover;
-            background-position: center;
+            background: none !important;
+            /* ✅ plus d'image globale */
         }
 
         .slides::after {
@@ -782,6 +781,47 @@
             /* autorise scroll vertical, on gère l'horizontal */
             user-select: none;
             -webkit-user-select: none;
+        }
+
+        /* Chaque slide devient une “carte” avec sa propre image */
+        .slide {
+            overflow: hidden;
+            border-radius: 26px;
+        }
+
+        /* Image par slide (nette, sans blur) */
+        .slide::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: var(--img-skyline);
+            /* défaut */
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.03);
+            z-index: -2;
+        }
+
+        /* Overlay (lisibilité + ambiance) */
+        .slide::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background:
+                linear-gradient(180deg,
+                    rgba(10, 15, 35, .10) 0%,
+                    rgba(10, 15, 35, .25) 50%,
+                    rgba(255, 255, 255, .90) 100%);
+        }
+
+        /* Slide 2/3 avec une autre image (café) */
+        .slide[data-slide="1"]::before {
+            background-image: var(--img-cafe);
+        }
+
+        .slide[data-slide="2"]::before {
+            background-image: var(--img-skyline);
         }
 
 
@@ -1750,9 +1790,9 @@
                         s.style.transform = `translateX(${offsetPx - slidesBox.clientWidth}px)`;
                         s.style.opacity = `${Math.min(1, Math.max(0, Math.abs(offsetPx) / 480))}`;
                     } else {
-                        // Remet proprement les autres
-                        s.style.transform = "";
-                        s.style.opacity = "";
+                        // cache complètement les autres slides
+                        s.style.transform = "translateX(9999px)";
+                        s.style.opacity = "0";
                     }
                 });
             }
