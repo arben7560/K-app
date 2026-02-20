@@ -175,10 +175,16 @@
             backdrop-filter: saturate(120%);
         }
 
-        .splash,
-        .hero {
+        .splash {
             min-height: 100vh;
         }
+
+        .hero {
+            
+            min-height: 52vh;
+        }
+
+        /* ou une valeur plus petite si tu veux un “grand hero” */
 
         .hero::before {
             content: "";
@@ -367,7 +373,7 @@
 
         /* Option : garde de l’air pour ne pas que la nav recouvre le contenu */
         .content {
-            padding-bottom: calc(120px + env(safe-area-inset-bottom));
+            padding: 16px 18px calc(120px + env(safe-area-inset-bottom));
         }
 
         .card {
@@ -611,12 +617,17 @@
             border-color: color-mix(in oklab, var(--primary) 25%, transparent);
         }
 
+        /* Le conteneur écran peut rester hidden si tu veux, mais les vues doivent scroller */
         .view {
             display: none;
+            height: 100%;
         }
 
         .view.active {
             display: block;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             animation: fadeUp .24s ease both;
         }
 
