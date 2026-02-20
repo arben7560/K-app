@@ -141,9 +141,8 @@
             width: 100vw;
             overflow: hidden;
             min-height: 100dvh;
-            /* ✅ viewport réel mobile */
-            padding-bottom: calc(92px + env(safe-area-inset-bottom));
-            /* réserve la place de la nav */
+            padding-bottom: 0;
+            /* ✅ IMPORTANT */
         }
 
         .phone {
@@ -366,8 +365,9 @@
             box-shadow: var(--shadow2), var(--ring);
         }
 
+        /* Option : garde de l’air pour ne pas que la nav recouvre le contenu */
         .content {
-            padding: 16px 18px 20px;
+            padding-bottom: calc(120px + env(safe-area-inset-bottom));
         }
 
         .card {
@@ -541,27 +541,30 @@
         .nav {
             position: fixed;
             left: 50%;
-            transform: translateX(-50%);
             bottom: calc(14px + env(safe-area-inset-bottom));
+            transform: translateX(-50%) translateY(16px);
+
             width: min(420px, calc(100% - 28px));
-            width: min(420px, calc(100% - 28px));
-            left: 0;
-            transform: none;
-            border-radius: 18px 18px 0 0;
-            background: color-mix(in oklab, var(--panel) 74%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 62%, transparent);
-            box-shadow: var(--shadow);
-            border-radius: 22px;
             padding: 10px;
             display: flex;
             gap: 8px;
+
+            border-radius: 22px;
+            background: color-mix(in oklab, var(--panel) 74%, transparent);
+            border: 1px solid color-mix(in oklab, var(--muted) 62%, transparent);
+            box-shadow: var(--shadow);
             backdrop-filter: blur(10px);
-            z-index: 999;
+
             opacity: 0;
-            transform: translateX(-50%) translateY(16px);
             pointer-events: none;
             transition: opacity .25s ease, transform .25s ease;
             z-index: 999;
+        }
+
+        .nav.is-visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
         }
 
         /* Nav visible quand on est prêt */
