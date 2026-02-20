@@ -1334,6 +1334,35 @@
             letter-spacing: -0.2px;
             font-weight: 700;
         }
+
+        /* ✅ MOBILE : ne plus rogner l'image sous ~440px */
+        @media (max-width: 440px) {
+
+            .splash::before,
+            .hero::before,
+            .slide::before {
+                background-size: contain;
+                /* ✅ image entière visible */
+                background-repeat: no-repeat;
+                background-position: center;
+                /* ou center top si tu préfères */
+            }
+
+            /* Derrière l'image, on met un fond pour éviter les "bandes" moches */
+            .splash::before,
+            .hero::before,
+            .slide::before {
+                background-color: #0f1525;
+                /* ou une couleur proche de ton thème */
+            }
+
+            /* Bonus : réduire le parallax sur mobile pour éviter les bords visibles */
+            .hero::before,
+            .splash::before,
+            .slide::before {
+                transform: translate3d(calc(var(--px) * .08), calc(var(--py) * .08), 0) scale(1);
+            }
+        }
     </style>
 </head>
 
