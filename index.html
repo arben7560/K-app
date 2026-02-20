@@ -158,10 +158,8 @@
             width: 100%;
             border-radius: 0;
             overflow: hidden;
-            /* ok */
-            padding-bottom: calc(92px + env(safe-area-inset-bottom));
-            /* ✅ si nav est dedans */
             position: relative;
+
         }
 
         /* -------------------------
@@ -188,16 +186,7 @@
             background-position: center 20%;
         }
 
-        /* on raccourcit l’assombrissement bas */
-        #view-home .hero::after {
-            background:
-                linear-gradient(180deg,
-                    rgba(10, 15, 35, .10) 0%,
-                    rgba(10, 15, 35, .35) 55%,
-                    rgba(10, 15, 35, .55) 100%),
-                radial-gradient(circle at 20% 10%, rgba(79, 109, 245, .45), transparent 45%),
-                radial-gradient(circle at 80% 0%, rgba(200, 182, 255, .28), transparent 40%);
-        }
+
 
         /* ou une valeur plus petite si tu veux un “grand hero” */
 
@@ -222,6 +211,17 @@
                     rgba(10, 15, 35, 0.85) 100%),
                 radial-gradient(circle at 20% 10%, rgba(79, 109, 245, 0.55), transparent 45%),
                 radial-gradient(circle at 80% 0%, rgba(200, 182, 255, 0.35), transparent 40%);
+        }
+
+        /* on raccourcit l’assombrissement bas */
+        #view-home .hero::after {
+            background:
+                linear-gradient(180deg,
+                    rgba(10, 15, 35, .10) 0%,
+                    rgba(10, 15, 35, .35) 55%,
+                    rgba(10, 15, 35, .55) 100%),
+                radial-gradient(circle at 20% 10%, rgba(79, 109, 245, .45), transparent 45%),
+                radial-gradient(circle at 80% 0%, rgba(200, 182, 255, .28), transparent 40%);
         }
 
         [data-theme="night"] .hero::after {
@@ -643,7 +643,9 @@
             height: 100%;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            animation: fadeUp .24s ease both;
+
+            /* ⛔️ IMPORTANT : pas de padding ici */
+            padding-bottom: 0;
         }
 
         @keyframes fadeUp {
