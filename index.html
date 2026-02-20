@@ -71,16 +71,16 @@
         }
 
         body {
-        
+
             font-family: var(--font);
-           background: radial-gradient(circle at center, #10182a, #05070f);
+            background: radial-gradient(circle at center, #10182a, #05070f);
             color: var(--text);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
             font-family: var(--font);
             min-height: 100vh;
-           
+
         }
 
         .brand .headline,
@@ -549,7 +549,18 @@
             gap: 8px;
             backdrop-filter: blur(10px);
             z-index: 50;
+            opacity: 0;
+            transform: translateX(-50%) translateY(16px);
+            transform: translateX(-50%) translateY(16px);
         }
+
+        /* Nav visible quand on est prêt */
+        .nav.is-visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
 
         .nav button {
             flex: 1;
@@ -1692,6 +1703,16 @@
 
         const screen = document.getElementById("screen");
 
+        const navEl = document.querySelector(".nav");
+
+        function showNav() {
+            navEl?.classList.add("is-visible");
+        }
+
+        function hideNav() {
+            navEl?.classList.remove("is-visible");
+        }
+
         function toastInline(msg) {
             const line = document.getElementById("ambientLine");
             if (line) {
@@ -1730,6 +1751,11 @@
 
             views[name].classList.add("active");
             setNav(name);
+            // Nav visible seulement à partir de Home (et après)
+            const shouldShowNav = ["home", "lessons", "lesson", "immersion"].includes(name);
+
+            if (shouldShowNav) showNav();
+            else hideNav();
         }
 
         const lessons = [
