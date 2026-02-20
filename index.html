@@ -110,11 +110,7 @@
             transform: translate3d(calc(var(--px) * .18), calc(var(--py) * .18), 0);
         }
 
-        /* Parallax sur les images des slides (important, car .slides::before est désactivé) */
-        .slide::before {
-            will-change: transform;
-            transform: translate3d(calc(var(--px) * .18), calc(var(--py) * .18), 0) scale(1);
-        }
+
 
         .card,
         .tile,
@@ -804,10 +800,7 @@
             }
         }
 
-        /* -------------------------
-       ONBOARDING
-       ------------------------- */
-        .onboard {
+        * ------------------------- ONBOARDING (FIX SLIDER) ------------------------- */ .onboard {
             padding: 18px;
             min-height: 620px;
             display: flex;
@@ -815,119 +808,80 @@
             gap: 14px;
         }
 
+        /* Le cadre des slides */
         .slides {
             flex: 1;
-            border-radius: 26px;
+            border-radius: 0;
             overflow: hidden;
             border: 1px solid color-mix(in oklab, var(--muted) 65%, transparent);
             box-shadow: var(--shadow2);
             position: relative;
             touch-action: pan-y;
-            /* swipe horizontal géré en JS */
             user-select: none;
 
-            /* ou var(--panel) si tu veux */
-            background: transparent !important;
-            /* ✅ évite flash noir/gris */
+            /* IMPORTANT: une hauteur réelle, sinon "height:100%" dépend du parent */
+            min-height: 420px;
         }
 
-        /* Désactivé: plus de background global (chaque slide a son image) */
-        .slides::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: none !important;
-        }
-
-        /* Overlay global (lisibilité) — sans blur pour éviter rendu “lavé” en drag */
-        .slides::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(180deg,
-                    rgba(79, 109, 245, .18),
-                    rgba(31, 42, 68, .14) 50%,
-                    rgba(250, 250, 250, .90) 100%);
-            pointer-events: none;
-        }
-
-        [data-theme="night"] .slides::after {
-            background:
-                linear-gradient(180deg,
-                    rgba(79, 109, 245, .18),
-                    rgba(31, 42, 68, .60) 55%,
-                    rgba(15, 21, 37, .95) 100%);
-        }
-
+        /* Chaque slide est SUPERPOSÉE (plus de stacking vertical) */
         .slide {
             position: absolute;
             inset: 0;
-            z-index: 1;
-            padding: 18px;
+            /* top/right/bottom/left = 0 */
+            overflow: hidden;
+            border-radius: 0;
+            isolation: isolate;
+            /* pour gérer z-index des pseudo-éléments */
+
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            gap: 10px;
+            padding: 28px;
 
-            overflow: hidden;
-            border-radius: 26px;
-
-            /* ✅ plus de fade */
-            opacity: 1;
-
-            /* ✅ chaque slide est hors écran par défaut */
-            transform: translateX(110%);
-            transition: none;
-            /* ✅ stop les conflits */
-            pointer-events: none;
+            /* état par défaut (inactif) */
+            opacity: 0;
             visibility: hidden;
-        }
-
-        /* ✅ la slide active est visible */
-        .slide.active {
+            pointer-events: none;
             transform: translateX(0);
-            pointer-events: auto;
+        }
+
+        /* Active visible */
+        .slide.active {
+            opacity: 1;
             visibility: visible;
+            pointer-events: auto;
         }
 
-        /* (Optionnel) petit perf mobile */
-        .slides {
-            contain: paint;
-        }
-
-        /* Image par slide (NET) */
+        /* IMAGE (une seule source) + parallax via transform défini plus haut */
         .slide::before {
             content: "";
             position: absolute;
             inset: 0;
-            background-image: var(--img-skyline);
+            background-image: var(--slide-bg);
             background-size: cover;
             background-position: center;
-            z-index: -2;
+            background-repeat: no-repeat;
+            z-index: 0;
+            transform: translate3d(calc(var(--px) * .18), calc(var(--py) * .18), 0) scale(1.02);
+            will-change: transform;
         }
 
-        /* Overlay local (un peu de contraste + “premium”) */
+        /* Overlay lisibilité */
         .slide::after {
             content: "";
             position: absolute;
             inset: 0;
-            z-index: -1;
-            background:
-                linear-gradient(180deg,
-                    rgba(10, 15, 35, .08) 0%,
-                    rgba(10, 15, 35, .18) 52%,
-                    rgba(255, 255, 255, .90) 100%);
+            z-index: 1;
+            background: linear-gradient(to top,
+                    rgba(255, 255, 255, 0.92) 0%,
+                    rgba(255, 255, 255, 0.65) 35%,
+                    rgba(255, 255, 255, 0) 70%);
         }
 
-        /* Slide 2 image café */
-        .slide[data-slide="1"]::before {
-            background-image: var(--img-cafe);
-        }
-
-        /* Slide 3 skyline (déjà default) */
-        .slide[data-slide="2"]::before {
-            background-image: var(--img-skyline);
+        /* Le contenu au-dessus */
+        .slide>* {
+            position: relative;
+            z-index: 2;
         }
 
         .slide .k {
@@ -944,6 +898,20 @@
             letter-spacing: -.2px;
         }
 
+        /* mapping image par slide (3 slides, 2 images) */
+        .slide[data-slide="0"] {
+            --slide-bg: var(--img-skyline);
+        }
+
+        .slide[data-slide="1"] {
+            --slide-bg: var(--img-cafe);
+        }
+
+        .slide[data-slide="2"] {
+            --slide-bg: var(--img-skyline);
+        }
+
+        /* pagination */
         .dots {
             display: flex;
             justify-content: center;
@@ -1298,11 +1266,6 @@
         }
 
 
-        /* Empêche tout overlay fixe derrière le track */
-        .slides::before,
-        .slides::after {
-            content: none !important;
-        }
 
         .slidesTrack {
             height: 100%;
@@ -1310,6 +1273,18 @@
 
         .slide {
             height: 100%;
+        }
+
+        .slide[data-slide="0"] {
+            --slide-bg: var(--img-skyline);
+        }
+
+        .slide[data-slide="1"] {
+            --slide-bg: var(--img-cafe);
+        }
+
+        .slide[data-slide="2"] {
+            --slide-bg: var(--img-skyline);
         }
 
 
@@ -1425,7 +1400,7 @@
                         <div class="mark" aria-hidden="true">
                             <div class="markGlow"></div>
                             <div class="markInner">
-                               
+
                                 <div class="markSub">study café</div>
                             </div>
                         </div>
