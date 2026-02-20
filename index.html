@@ -168,20 +168,35 @@
        HERO
        ------------------------- */
         .hero {
-            padding: 18px;
             position: relative;
             overflow: hidden;
-
             backdrop-filter: saturate(120%);
+        }
+
+        /* Hero moins haut */
+        #view-home .hero {
+            min-height: 0;
+            height: clamp(220px, 38vh, 340px);
+            padding: 16px 18px;
         }
 
         .splash {
             min-height: 100vh;
         }
 
-        .hero {
-            
-            min-height: 52vh;
+        #view-home .hero::before {
+            background-position: center 20%;
+        }
+
+        /* on raccourcit l’assombrissement bas */
+        #view-home .hero::after {
+            background:
+                linear-gradient(180deg,
+                    rgba(10, 15, 35, .10) 0%,
+                    rgba(10, 15, 35, .35) 55%,
+                    rgba(10, 15, 35, .55) 100%),
+                radial-gradient(circle at 20% 10%, rgba(79, 109, 245, .45), transparent 45%),
+                radial-gradient(circle at 80% 0%, rgba(200, 182, 255, .28), transparent 40%);
         }
 
         /* ou une valeur plus petite si tu veux un “grand hero” */
