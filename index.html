@@ -61,22 +61,26 @@
         body {
             margin: 0;
             padding: 0;
-            height: 100%;
-            width: 100%;
+            background: #0b0f1a;
+            overflow-x: hidden;
+            min-height: 100dvh;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            margin: 0;
+        
             font-family: var(--font);
-            background:
-                radial-gradient(1200px 900px at 12% 12%, rgba(200, 182, 255, .22), transparent 55%),
-                radial-gradient(1200px 900px at 88% 18%, rgba(79, 109, 245, .18), transparent 55%),
-                var(--bg);
+           background: radial-gradient(circle at center, #10182a, #05070f);
             color: var(--text);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
             font-family: var(--font);
+            min-height: 100vh;
+           
         }
 
         .brand .headline,
@@ -146,7 +150,6 @@
 
         .screen {
             background: color-mix(in oklab, var(--panel) 92%, transparent);
-            border: 1px solid color-mix(in oklab, var(--muted) 65%, transparent);
             box-shadow: var(--shadow);
             height: 100%;
             width: 100%;
@@ -772,7 +775,7 @@
             user-select: none;
 
             /* ou var(--panel) si tu veux */
-            background: #ffffff !important;
+            background: transparent !important;
             /* ✅ évite flash noir/gris */
         }
 
